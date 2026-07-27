@@ -12,6 +12,8 @@ package internal
 import (
 	"image/color"
 
+	"gioui.org/font/gofont"
+	"gioui.org/text"
 	"gioui.org/widget/material"
 )
 
@@ -24,8 +26,11 @@ type Theme struct {
 
 // NewTheme 初始化 Theme 并返回默认主题
 func NewTheme() *Theme {
+	th := material.NewTheme()
+	th.Shaper = text.NewShaper(text.WithCollection(gofont.Collection()))
+
 	return &Theme{
-		Material: material.NewTheme(),                        // 使用默认 Go 字体
+		Material: th,                                         //
 		Primary:  color.NRGBA{R: 33, G: 150, B: 243, A: 255}, // 蓝色
 		Accent:   color.NRGBA{R: 255, G: 193, B: 7, A: 255},  // 黄色
 	}
