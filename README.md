@@ -123,3 +123,11 @@ import "github.com/rocwg/gorogio/internal"
 
 
 
+gorogio 是基于 Gio 构建的个人 GUI 工程资产库。
+
+目标：
+- 不追逐前端生态
+- 建立自己的 GUI 组件体系
+- 长期积累工具软件生产能力
+
+---

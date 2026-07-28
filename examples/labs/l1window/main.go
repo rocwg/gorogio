@@ -7,8 +7,8 @@ import (
 	"gioui.org/app"
 	"gioui.org/op"
 	"gioui.org/widget"
-	"github.com/rocwg/gorogio/internal"
-	"github.com/rocwg/gorogio/labs/l8text"
+	"github.com/rocwg/gorogio/examples/labs/l8text"
+	"github.com/rocwg/gorogio/style"
 )
 
 /*
@@ -69,7 +69,7 @@ func run(window *app.Window) error {
 	// ========== STATE 区 ==========
 	var ops op.Ops // ops 是“指令缓冲区容器”，不是“绘制结果”
 
-	th := internal.NewTheme()
+	th := style.NewTheme()
 	btn := new(widget.Clickable) // 交互 state（非常关键）
 	clicked := false             // 业务 state
 

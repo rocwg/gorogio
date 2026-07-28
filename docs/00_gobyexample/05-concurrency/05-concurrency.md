@@ -12,31 +12,70 @@
 
 ## 1. Goroutines
 
-1.1 一句话理解
-
-goroutine 是 Go 里轻量级的并发执行单元。
+1.1 一句话理解：goroutine 是 Go 里轻量级的并发执行单元。
 
 1.2 示例代码
 
 ```go
+// A _goroutine_ is a lightweight thread of execution.
+
 package main
 
 import (
-    "fmt"
-    "time"
+	"fmt"
+	"time"
 )
 
 func f(from string) {
-    for i := 0; i < 3; i++ {
-        fmt.Println(from, ":", i)
-    }
+	for i := range 3 {
+		fmt.Println(from, ":", i)
+	}
 }
 
 func main() {
-    go f("goroutine")
-    f("direct")
-    time.Sleep(time.Second)
+
+	// Suppose we have a function call `f(s)`. Here's how
+	// we'd call that in the usual way, running it
+	// synchronously.
+	f("direct")
+
+	// To invoke this function in a goroutine, use
+	// `go f(s)`. This new goroutine will execute
+	// concurrently with the calling one.
+	go f("goroutine")
+
+	// You can also start a goroutine for an anonymous
+	// function call.
+	go func(msg string) {
+		fmt.Println(msg)
+	}("going")
+
+	// Our two function calls are running asynchronously in
+	// separate goroutines now. Wait for them to finish
+	// (for a more robust approach, use a [WaitGroup](waitgroups)).
+	time.Sleep(time.Second)
+	fmt.Println("done")
 }
+```
+
+```bash
+# When we run this program, we see the output of the
+# blocking call first, then the output of the two
+# goroutines. The goroutines' output may be interleaved,
+# because goroutines are being run concurrently by the
+# Go runtime.
+$ go run goroutines.go
+direct : 0
+direct : 1
+direct : 2
+goroutine : 0
+going
+goroutine : 1
+goroutine : 2
+done
+
+# Next we'll look at a complement to goroutines in
+# concurrent Go programs: channels.
 ```
 
 | 1.3 重点                                       | 1.4 常见坑                              |
@@ -53,9 +92,7 @@ goroutine 是 Go 并发的基础单位。
 
 ## 2. Channels
 
-2.1 一句话理解
-
-channel 是 goroutine 之间传递数据的通道。
+2.1 一句话理解：channel 是 goroutine 之间传递数据的通道。
 
 2.2 示例代码
 
@@ -161,9 +198,7 @@ channel 也可以当“通知灯”。
 
 ## 5. Channel Directions
 
-5.1 一句话理解
-
-channel 可以限定为单向发送或单向接收。
+5.1 一句话理解：channel 可以限定为单向发送或单向接收。
 
 2.2 示例代码
 
@@ -204,9 +239,7 @@ func main() {
 
 ## 6. Select
 
-6.1 一句话理解
-
-`select` 用于同时等待多个 channel 操作。
+6.1 一句话理解：`select` 用于同时等待多个 channel 操作。
 
 6.2 示例代码
 
@@ -249,9 +282,7 @@ func main() {
 
 ## 7. Timeouts
 
-7.1 一句话理解
-
-超时用于避免 goroutine 永远等待。
+7.1 一句话理解：超时用于避免 goroutine 永远等待。
 
 7.2 示例代码
 
@@ -293,9 +324,7 @@ func main() {
 
 ## 8. Non-Blocking Channel Operations
 
-8.1 一句话理解
-
-通过 `select` + `default` 可以做非阻塞操作。
+8.1 一句话理解：通过 `select` + `default` 可以做非阻塞操作。
 
 8.2 示例代码
 
@@ -329,9 +358,7 @@ func main() {
 
 ## 9. Closing Channels
 
-9.1 一句话理解
-
-关闭 channel 表示不再发送数据了。
+9.1 一句话理解：关闭 channel 表示不再发送数据了。
 
 9.2 示例代码
 
@@ -366,27 +393,46 @@ close 是生命周期控制，不是“清空”操作。
 
 ## 10. Range over Channels
 
-10.1 一句话理解
-
-`range` 可以持续接收 channel 数据，直到它被关闭。
+10.1 一句话理解：`range` 可以持续接收 channel 数据，直到它被关闭。
 
 10.2 示例代码
 
 ```go
+// In a [previous](range-over-built-in-types) example we saw how `for` and
+// `range` provide iteration over basic data structures.
+// We can also use this syntax to iterate over
+// values received from a channel.
+
 package main
 
 import "fmt"
 
 func main() {
-    queue := make(chan string, 2)
-    queue <- "one"
-    queue <- "two"
-    close(queue)
 
-    for elem := range queue {
-        fmt.Println(elem)
-    }
+	// We'll iterate over 2 values in the `queue` channel.
+	queue := make(chan string, 2)
+	queue <- "one"
+	queue <- "two"
+	close(queue)
+
+	// This `range` iterates over each element as it's
+	// received from `queue`. Because we `close`d the
+	// channel above, the iteration terminates after
+	// receiving the 2 elements.
+	for elem := range queue {
+		fmt.Println(elem)
+	}
 }
+```
+
+```bash
+$ go run range-over-channels.go
+one
+two
+
+# This example also showed that it's possible to close
+# a non-empty channel but still have the remaining
+# values be received.
 ```
 
 | 10.3 重点               | 10.4 常见坑                     |
@@ -402,9 +448,7 @@ func main() {
 
 ## 11. Timers
 
-11.1 一句话理解
-
-timer 用于在未来某个时间点触发一次事件。
+11.1 一句话理解：timer 用于在未来某个时间点触发一次事件。
 
 11.2 示例代码
 
@@ -436,9 +480,7 @@ timer 是“一次性定时器”。
 
 ## 12. Tickers
 
-12.1 一句话理解
-
-ticker 会按固定间隔重复触发。
+12.1 一句话理解：ticker 会按固定间隔重复触发。
 
 12.2 示例代码
 
@@ -484,9 +526,7 @@ ticker 是“周期闹钟”。
 
 ## 13. Worker Pools
 
-13.1 一句话理解
-
-worker pool 是一组工作协程处理任务队列。
+13.1 一句话理解：worker pool 是一组工作协程处理任务队列。
 
 13.2 示例代码
 
@@ -537,9 +577,7 @@ worker pool 是并发的“限流执行模式”。
 
 ## 14. WaitGroups
 
-14.1 一句话理解
-
-WaitGroup 用来等待一组 goroutine 完成。
+14.1 一句话理解：WaitGroup 用来等待一组 goroutine 完成。
 
 14.2 示例代码
 
@@ -583,9 +621,7 @@ WaitGroup 是 goroutine 的“计数闸门”。
 
 ## 15. Rate Limiting
 
-15.1 一句话理解
-
-限流用来控制操作发生的频率。
+15.1 一句话理解：限流用来控制操作发生的频率。
 
 15.2 示例代码
 
@@ -625,9 +661,7 @@ func main() {
 
 ## 16. Atomic Counters
 
-16.1 一句话理解
-
-原子操作用于在并发下安全地修改计数值。
+16.1 一句话理解：原子操作用于在并发下安全地修改计数值。
 
 16.2 示例代码
 
@@ -670,9 +704,7 @@ func main() {
 
 ## 17. Mutexes
 
-17.1 一句话理解
-
-互斥锁用于保护共享数据，避免并发冲突。
+17.1 一句话理解：互斥锁用于保护共享数据，避免并发冲突。
 
 17.2 示例代码
 
@@ -722,9 +754,7 @@ func main() {
 
 ## 18. Stateful Goroutines
 
-18.1 一句话理解
-
-用 goroutine 自己管理状态，避免多个协程直接争抢数据。
+18.1 一句话理解：用 goroutine 自己管理状态，避免多个协程直接争抢数据。
 
 18.2 示例代码
 
