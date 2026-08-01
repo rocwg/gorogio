@@ -12,14 +12,6 @@ import (
 
 //其实：HelloComponent，已经不是一个 Component。
 //而是：一个 Page。
-//Application
-//        │
-//        ▼
-//    HelloPage
-//        │
-//        ├── Title()
-//        ├── Button()
-//        └── Counter()
 
 type HelloPage struct {
 	Increment widget.Clickable
@@ -58,34 +50,44 @@ func (p *HelloPage) Layout(
 
 	//第一：Column（纵向布局）
 
-	return layout.Flex{
-		Axis:      layout.Vertical,
-		Alignment: layout.Middle,
+	return layout.Inset{
+		Top:    40,
+		Bottom: 40,
+		Left:   40,
+		Right:  40,
 	}.Layout(
-
 		gtx,
+		func(gtx layout.Context) layout.Dimensions {
 
-		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-			return p.layoutHeader(gtx, theme)
-		}),
+			return layout.Flex{
+				Axis:      layout.Vertical,
+				Alignment: layout.Middle,
+			}.Layout(
 
-		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-			return layout.Spacer{Height: 20}.Layout(gtx)
-		}),
+				gtx,
 
-		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-			return p.layoutCounter(gtx, theme)
-		}),
+				layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+					return p.layoutHeader(gtx, theme)
+				}),
 
-		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-			return layout.Spacer{Height: 20}.Layout(gtx)
-		}),
+				layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+					return layout.Spacer{Height: 20}.Layout(gtx)
+				}),
 
-		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-			return p.layoutActions(gtx, theme)
-		}),
+				layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+					return p.layoutCounter(gtx, theme)
+				}),
+
+				layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+					return layout.Spacer{Height: 20}.Layout(gtx)
+				}),
+
+				layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+					return p.layoutActions(gtx, theme)
+				}),
+			)
+		},
 	)
-
 }
 
 func (p *HelloPage) layoutHeader(
@@ -124,23 +126,28 @@ func (p *HelloPage) layoutActions(
 	theme *material.Theme,
 ) layout.Dimensions {
 
-	return layout.Flex{
-		Axis:      layout.Horizontal,
-		Alignment: layout.Middle,
-	}.Layout(
-
+	return layout.Center.Layout(
 		gtx,
+		func(gtx layout.Context) layout.Dimensions {
 
-		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-			return material.Button(theme, &p.Increment, "+").Layout(gtx)
-		}),
+			return layout.Flex{
+				Axis: layout.Horizontal,
+			}.Layout(
 
-		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-			return layout.Spacer{Width: 16}.Layout(gtx)
-		}),
+				gtx,
 
-		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-			return material.Button(theme, &p.Reset, "Reset").Layout(gtx)
-		}),
+				layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+					return material.Button(theme, &p.Increment, "+").Layout(gtx)
+				}),
+
+				layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+					return layout.Spacer{Width: 16}.Layout(gtx)
+				}),
+
+				layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+					return material.Button(theme, &p.Reset, "Reset").Layout(gtx)
+				}),
+			)
+		},
 	)
 }
