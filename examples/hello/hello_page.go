@@ -2,6 +2,7 @@ package main
 
 import (
 	"image/color"
+	"strconv"
 
 	"gioui.org/layout"
 	"gioui.org/text"
@@ -27,23 +28,35 @@ type HelloPage struct {
 	State *CounterState
 }
 
-func NewHelloComponent(
-	state *CounterState,
-) *HelloPage {
-
+func NewHelloPage(state *CounterState) *HelloPage {
 	return &HelloPage{
 		State: state,
 	}
 }
 
-func (c *HelloPage) Layout(
+//Layout：
+//Column
+//    Header
+//    Spacer
+//    Counter
+//    Spacer
+//    Actions(Row)
+
+func (p *HelloPage) Layout(
 	gtx layout.Context,
 	theme *material.Theme,
 ) layout.Dimensions {
 
-	for c.Increment.Clicked(gtx) {
-		c.State.Increment()
+	// 处理事件
+	for p.Increment.Clicked(gtx) {
+		p.State.Increment()
 	}
+
+	for p.Reset.Clicked(gtx) {
+		p.State.Reset()
+	}
+
+	//第一：Column（纵向布局）
 
 	return layout.Flex{
 		Axis:      layout.Vertical,
@@ -52,59 +65,36 @@ func (c *HelloPage) Layout(
 
 		gtx,
 
-		layout.Rigid(
-			func(gtx layout.Context) layout.Dimensions {
+		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+			return p.layoutHeader(gtx, theme)
+		}),
 
-				return c.Title(
-					gtx,
-					theme,
-				)
+		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+			return layout.Spacer{Height: 20}.Layout(gtx)
+		}),
 
-			},
-		),
+		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+			return p.layoutCounter(gtx, theme)
+		}),
 
-		layout.Rigid(
-			func(gtx layout.Context) layout.Dimensions {
+		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+			return layout.Spacer{Height: 20}.Layout(gtx)
+		}),
 
-				return layout.Spacer{
-					Height: 20,
-				}.Layout(gtx)
-
-			},
-		),
-
-		layout.Rigid(
-			func(gtx layout.Context) layout.Dimensions {
-
-				return c.ButtonView(
-					gtx,
-					theme,
-				)
-
-			},
-		),
-
-		layout.Rigid(
-			func(gtx layout.Context) layout.Dimensions {
-
-				return c.Counter(
-					gtx,
-					theme,
-				)
-
-			},
-		),
+		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+			return p.layoutActions(gtx, theme)
+		}),
 	)
 
 }
 
-func (c *HelloPage) Title(
+func (p *HelloPage) layoutHeader(
 	gtx layout.Context,
 	theme *material.Theme,
 ) layout.Dimensions {
 
 	// Define a large label with an appropriate text:
-	title := material.H1(theme, "Hello, Gio")
+	title := material.H3(theme, "Hello, Gio")
 
 	// Change the color of the label.
 	title.Color = color.NRGBA{R: 127, G: 0, B: 0, A: 255}
@@ -116,39 +106,41 @@ func (c *HelloPage) Title(
 	return title.Layout(gtx)
 }
 
-func (c *HelloPage) ButtonView(
+func (p *HelloPage) layoutCounter(
 	gtx layout.Context,
 	theme *material.Theme,
 ) layout.Dimensions {
 
-	button := material.Button(theme, &c.Increment, "Click Me")
-	return button.Layout(gtx)
-}
+	txt := "Count : " + strconv.Itoa(p.State.Count)
+	label := material.Body1(theme, txt)
 
-func (c *HelloPage) Counter(
-	gtx layout.Context,
-	theme *material.Theme,
-) layout.Dimensions {
+	label.Alignment = text.Middle
 
-	label := material.Body1(
-		theme,
-		"Count: "+itoa(
-			c.State.Count,
-		),
-	)
 	return label.Layout(gtx)
 }
 
-func itoa(v int) string {
+func (p *HelloPage) layoutActions(
+	gtx layout.Context,
+	theme *material.Theme,
+) layout.Dimensions {
 
-	if v == 0 {
-		return "0"
-	}
+	return layout.Flex{
+		Axis:      layout.Horizontal,
+		Alignment: layout.Middle,
+	}.Layout(
 
-	buf := ""
-	for v > 0 {
-		buf = string(rune('0'+v%10)) + buf
-		v /= 10
-	}
-	return buf
+		gtx,
+
+		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+			return material.Button(theme, &p.Increment, "+").Layout(gtx)
+		}),
+
+		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+			return layout.Spacer{Width: 16}.Layout(gtx)
+		}),
+
+		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+			return material.Button(theme, &p.Reset, "Reset").Layout(gtx)
+		}),
+	)
 }

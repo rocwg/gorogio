@@ -5,9 +5,7 @@ import (
 	"os"
 
 	"gioui.org/app"
-	"gioui.org/layout"
 	"gioui.org/op"
-	"gioui.org/widget/material"
 )
 
 //Gio Window + Event Loop
@@ -25,6 +23,9 @@ func Run() {
 }
 
 func runWindow(window *app.Window) error {
+	//放在哪里？
+	var application = NewApplication()
+
 	//定义操作
 	var ops op.Ops
 
@@ -43,42 +44,10 @@ func runWindow(window *app.Window) error {
 			gtx := app.NewContext(&ops, e)
 
 			//UI 描述（未来 view 层的雏形）
-			DrawUI(gtx)
+			application.Draw(gtx)
 
 			// Pass the drawing operations to the GPU.
 			e.Frame(gtx.Ops)
 		}
 	}
-}
-
-//Theme 应该属于 Application，而不是 UI。
-//State
-//Component
-
-type Application struct {
-	Theme   *material.Theme
-	Counter CounterState
-	Hello   *HelloPage
-}
-
-func NewApplication() *Application {
-	//创建主题
-	theme := material.NewTheme()
-	//状态
-	state := CounterState{}
-	//
-	component := NewHelloComponent(&state)
-
-	return &Application{
-		Theme:   theme,
-		Counter: state,
-		Hello:   component,
-	}
-}
-
-func (a *Application) Draw(
-	gtx layout.Context,
-) {
-	//
-	a.Hello.Layout(gtx, a.Theme)
 }
