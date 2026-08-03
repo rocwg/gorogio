@@ -312,27 +312,21 @@ Backend Architecture Assets
 实际上是上下游关系。
 
 ```
-                 Software Creation Capability
-
+      Software Creation Capability
 
         ┌──────────────────────┐
         │                      │
         ↓                      ↓
 
-
 Go + Gio                    API Engineering
 
 创造工具能力                 架构设计能力
 
-
         ↓                      ↓
-
 
 Prototype Engine          Backend Platform
 
-
         └──────────┬───────────┘
-
                    ↓
 
           Personal Software Factory
@@ -453,7 +447,7 @@ Personal Software Factory
 
 这是一个非常健康的长期路线。
 
-下一步，我建议我们回到 `gorogio/examples/hello`，但是带着这个新的目标：
+下一步，我建议我们回到 `examples/gio/hello`，但是带着这个新的目标：
 
 **不是“继续写 Hello”，而是开始建立第一个 Go × Gio 工程样本。**
 

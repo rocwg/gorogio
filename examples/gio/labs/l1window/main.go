@@ -7,7 +7,7 @@ import (
 	"gioui.org/app"
 	"gioui.org/op"
 	"gioui.org/widget"
-	"github.com/rocwg/gorogio/examples/labs/l8text"
+	"github.com/rocwg/gorogio/examples/gio/labs/l8text"
 	"github.com/rocwg/gorogio/style"
 )
 
