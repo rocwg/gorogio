@@ -5,8 +5,11 @@ import (
 	"os"
 
 	"gioui.org/app"
-	"gioui.org/layout"
 	"gioui.org/op"
+
+	"github.com/rocwg/gorogio/container"
+	"github.com/rocwg/gorogio/element"
+	"github.com/rocwg/gorogio/modifier"
 	"github.com/rocwg/gorogio/style"
 	"github.com/rocwg/gorogio/view"
 )
@@ -24,10 +27,7 @@ func main() {
 }
 
 func run(w *app.Window) error {
-	// 1. 初始化主题与状态
 	th := style.NewTheme()
-	submitBtn := &view.PrimaryButton{Text: "提交数据"}
-
 	var ops op.Ops
 
 	for {
@@ -38,18 +38,29 @@ func run(w *app.Window) error {
 		case app.FrameEvent:
 			gtx := app.NewContext(&ops, e)
 
-			// 2. 响应业务逻辑
-			if submitBtn.Clicked(gtx) {
-				log.Println("业务点击：数据提交中...")
-			}
-
-			// 3. 页面渲染
-			layout.Center.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-				// 调用封装好的组件进行布局
-				return submitBtn.Layout(gtx, th)
-			})
+			ui := page(th)
+			ui(gtx)
 
 			e.Frame(gtx.Ops)
 		}
 	}
+}
+
+func page(
+	th *style.Theme,
+) element.Element {
+
+	return container.Column(
+
+		view.Text(
+			"Hello Gio",
+		),
+
+		modifier.Padding(
+			16,
+			view.Text(
+				"Goro UI",
+			),
+		),
+	)
 }
