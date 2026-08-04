@@ -6,17 +6,13 @@ import (
 	"github.com/rocwg/gorogio/element"
 )
 
-// Row
-//
-// 水平布局容器。
+// Row 水平布局容器。
 //
 // 对应:
 //
 // Compose: Row
 // SwiftUI: HStack
 // Flutter: Row
-//
-
 func Row(
 	children ...element.Element,
 ) element.Element {

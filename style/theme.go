@@ -7,24 +7,10 @@ import (
 	"gioui.org/widget/material"
 )
 
-// Theme
-//
-// goro-ui 视觉环境。
-//
-// 第一阶段:
-//
-// 内部复用 Gio material.Theme。
-//
-// 后续:
-//
-// 可以加入:
-//
-// Color
-// Typography
-// Spacing
-//
-
+// Theme Render Environment（渲染环境）。
 type Theme struct {
+
+	// 内部复用 Gio material.Theme
 	Material *material.Theme
 
 	// 扩展：自定义尺寸
@@ -35,11 +21,7 @@ type Theme struct {
 	}
 }
 
-// NewTheme
-//
-// 创建默认主题
-//
-
+// NewTheme 创建默认主题
 func NewTheme() *Theme {
 
 	// 初始化你自己的主题

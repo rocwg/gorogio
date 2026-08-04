@@ -6,21 +6,14 @@ import (
 	"github.com/rocwg/gorogio/element"
 )
 
-// Column
-//
-// 垂直布局容器。
+// Column 垂直布局容器。
 //
 // 对应:
 //
 // Compose: Column
 // SwiftUI: VStack
 // Flutter: Column
-//
-// Gio:
-//
-//	Flex + Vertical
-//
-
+// Gio:	Flex + Vertical
 func Column(
 	children ...element.Element,
 ) element.Element {

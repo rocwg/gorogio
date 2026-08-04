@@ -7,21 +7,14 @@ import (
 	"github.com/rocwg/gorogio/element"
 )
 
-// Padding
-//
-// 给元素增加内边距。
+// Padding 给元素增加内边距。
 //
 // 对应:
 //
 // Compose: Modifier.padding()
 // SwiftUI: padding()
 // Flutter: Padding()
-//
-// Gio:
-//
-//	layout.Inset
-//
-
+// Gio: layout.Inset
 func Padding(
 	value unit.Dp,
 	child element.Element,

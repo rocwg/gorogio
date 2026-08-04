@@ -6,9 +6,7 @@ import (
 	"github.com/rocwg/gorogio/element"
 )
 
-// Stack
-//
-// 层叠布局。
+// Stack 层叠布局。
 //
 // 对应:
 //
@@ -17,8 +15,6 @@ import (
 // Flutter: Stack
 //
 // 用于: 背景、浮层、Badge、Floating Button
-//
-
 func Stack(
 	children ...element.Element,
 ) element.Element {

@@ -53,12 +53,14 @@ func page(
 	return container.Column(
 
 		view.Text(
+			th,
 			"Hello Gio",
 		),
 
 		modifier.Padding(
 			16,
 			view.Text(
+				th,
 				"Goro UI",
 			),
 		),

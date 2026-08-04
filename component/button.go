@@ -6,39 +6,25 @@ import (
 	"gioui.org/widget/material"
 
 	"github.com/rocwg/gorogio/element"
+	"github.com/rocwg/gorogio/style"
 )
 
-// Button
-//
-// goro-ui 第一个组件。
-//
-// 负责:
-//
-// 1. 点击状态
-// 2. Material Button 渲染
+// Button 第一个 UI 单元
 //
 // 对应:
 //
 // Compose: Button()
 // SwiftUI: Button
 // Flutter: ElevatedButton
-//
-
 type Button struct {
+	theme *style.Theme
 	click widget.Clickable
-
-	text string
-
-	theme *material.Theme
+	text  string
 }
 
-// NewButton
-//
-// 创建按钮
-//
-
+// NewButton 创建按钮
 func NewButton(
-	theme *material.Theme,
+	theme *style.Theme,
 	text string,
 ) *Button {
 
@@ -48,11 +34,7 @@ func NewButton(
 	}
 }
 
-// Element
-//
-// 返回 goro-ui Element
-//
-
+// Element ？
 func (b *Button) Element() element.Element {
 
 	return func(
@@ -60,18 +42,14 @@ func (b *Button) Element() element.Element {
 	) layout.Dimensions {
 
 		return material.Button(
-			b.theme,
+			b.theme.Material,
 			&b.click,
 			b.text,
 		).Layout(gtx)
 	}
 }
 
-// Clicked
-//
-// 查询按钮是否点击
-//
-
+// Clicked 查询按钮是否点击
 func (b *Button) Clicked(
 	gtx layout.Context,
 ) bool {

@@ -28,9 +28,9 @@ func (p *HelloPage) Element(
 	return modifier.Padding(
 		40,
 		container.Column(
-			view.Text("Hello Gio"),
+			view.Text(th, "Hello Gio"),
 			view.Spacer(20),
-			view.Text("Goro UI"),
+			view.Text(th, "Goro UI"),
 		),
 	)
 }
