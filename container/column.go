@@ -13,8 +13,9 @@ import (
 // Compose: Column
 // SwiftUI: VStack
 // Flutter: Column
-// Gio:	Flex + Vertical
+// Gio: layout.Flex + Vertical
 func Column(
+	options Options,
 	children ...element.Element,
 ) element.Element {
 
@@ -22,22 +23,46 @@ func Column(
 		gtx layout.Context,
 	) layout.Dimensions {
 
+		flex := layout.Flex{
+			Axis:      layout.Vertical,
+			Alignment: options.Alignment,
+		}
+
 		items := make(
 			[]layout.FlexChild,
 			0,
-			len(children),
+			len(children)*2,
 		)
 
-		for _, child := range children {
+		for index, child := range children {
+
+			// 第二个元素开始增加间距
+			if index > 0 &&
+				options.Spacing > 0 {
+
+				items = append(
+					items,
+
+					layout.Rigid(
+						func(
+							gtx layout.Context,
+						) layout.Dimensions {
+
+							return layout.Spacer{
+								Height: options.Spacing,
+							}.Layout(gtx)
+						},
+					),
+				)
+			}
+
 			items = append(
 				items,
 				layout.Rigid(child),
 			)
 		}
 
-		return layout.Flex{
-			Axis: layout.Vertical,
-		}.Layout(
+		return flex.Layout(
 			gtx,
 			items...,
 		)

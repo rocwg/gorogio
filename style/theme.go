@@ -7,6 +7,12 @@ import (
 	"gioui.org/widget/material"
 )
 
+type Spacing struct {
+	Small  unit.Dp
+	Medium unit.Dp
+	Large  unit.Dp
+}
+
 // Theme Render Environment（渲染环境）。
 type Theme struct {
 
@@ -14,11 +20,7 @@ type Theme struct {
 	Material *material.Theme
 
 	// 扩展：自定义尺寸
-	Spacing struct {
-		Small  unit.Dp
-		Medium unit.Dp
-		Large  unit.Dp
-	}
+	Spacing Spacing
 }
 
 // NewTheme 创建默认主题

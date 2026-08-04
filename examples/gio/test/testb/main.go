@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"gioui.org/app"
+	"gioui.org/layout"
 	"gioui.org/op"
 
 	"github.com/rocwg/gorogio/container"
@@ -52,17 +53,17 @@ func page(
 
 	return container.Column(
 
-		view.Text(
-			th,
-			"Hello Gio",
-		),
+		container.Options{
+			Spacing:   16,
+			Alignment: layout.Middle,
+		},
+
+		view.Text(th, "Hello Gio"),
+		view.Text(th, "Goro UI"),
 
 		modifier.Padding(
-			16,
-			view.Text(
-				th,
-				"Goro UI",
-			),
+			30,
+			view.Text(th, "Goro UI"),
 		),
 	)
 }

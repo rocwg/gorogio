@@ -1,6 +1,7 @@
 package main
 
 import (
+	"gioui.org/layout"
 	"github.com/rocwg/gorogio/container"
 	"github.com/rocwg/gorogio/element"
 	"github.com/rocwg/gorogio/modifier"
@@ -28,8 +29,11 @@ func (p *HelloPage) Element(
 	return modifier.Padding(
 		40,
 		container.Column(
+			container.Options{
+				Spacing:   50,
+				Alignment: layout.Middle,
+			},
 			view.Text(th, "Hello Gio"),
-			view.Spacer(20),
 			view.Text(th, "Goro UI"),
 		),
 	)

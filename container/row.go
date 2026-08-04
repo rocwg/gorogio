@@ -13,7 +13,9 @@ import (
 // Compose: Row
 // SwiftUI: HStack
 // Flutter: Row
+// Gio: layout.Flex + Horizontal
 func Row(
+	options Options,
 	children ...element.Element,
 ) element.Element {
 
@@ -21,22 +23,45 @@ func Row(
 		gtx layout.Context,
 	) layout.Dimensions {
 
+		flex := layout.Flex{
+			Axis:      layout.Horizontal,
+			Alignment: options.Alignment,
+		}
+
 		items := make(
 			[]layout.FlexChild,
 			0,
-			len(children),
+			len(children)*2,
 		)
 
-		for _, child := range children {
+		for index, child := range children {
+
+			if index > 0 &&
+				options.Spacing > 0 {
+
+				items = append(
+					items,
+
+					layout.Rigid(
+						func(
+							gtx layout.Context,
+						) layout.Dimensions {
+
+							return layout.Spacer{
+								Width: options.Spacing,
+							}.Layout(gtx)
+						},
+					),
+				)
+			}
+
 			items = append(
 				items,
 				layout.Rigid(child),
 			)
 		}
 
-		return layout.Flex{
-			Axis: layout.Horizontal,
-		}.Layout(
+		return flex.Layout(
 			gtx,
 			items...,
 		)
