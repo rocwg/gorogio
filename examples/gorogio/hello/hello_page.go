@@ -24,33 +24,43 @@ func NewHelloPage(
 	state *CounterState,
 ) *HelloPage {
 
-	return &HelloPage{
+	page := &HelloPage{
 		State: state,
-
-		Increment: component.NewButton("+"),
-		Reset:     component.NewButton("Reset"),
 	}
+
+	page.Increment =
+		component.NewButton("+").
+			OnClick(
+				func() {
+					page.State.Increment()
+				},
+			)
+
+	page.Reset =
+		component.NewButton("Reset").
+			OnClick(
+				func() {
+					page.State.Reset()
+				},
+			)
+
+	return page
 }
 
-// update
+// Event 层
+
+// Update
 //
-// 处理页面事件。
-func (p *HelloPage) update(
+// 处理页面输入事件。
+func (p *HelloPage) Update(
 	gtx layout.Context,
 ) {
-
-	if p.Increment.Clicked(gtx) {
-		p.State.Increment()
-	}
-	if p.Reset.Clicked(gtx) {
-		p.State.Reset()
-	}
+	p.Increment.Update(gtx)
+	p.Reset.Update(gtx)
 }
 
-// Element
-//
-// 构建页面 Element Tree。
-func (p *HelloPage) Element(
+// View 层
+func (p *HelloPage) View(
 	th *style.Theme,
 ) element.Element {
 
@@ -72,4 +82,22 @@ func (p *HelloPage) Element(
 			),
 		),
 	)
+}
+
+// Element
+//
+// 构建页面 Element Tree。
+func (p *HelloPage) Element(
+	th *style.Theme,
+) element.Element {
+
+	return func(
+		gtx layout.Context,
+	) layout.Dimensions {
+
+		// 先处理事件，再渲染 UI。
+		p.Update(gtx)
+
+		return p.View(th)(gtx)
+	}
 }

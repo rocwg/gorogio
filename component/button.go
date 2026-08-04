@@ -9,7 +9,13 @@ import (
 	"github.com/rocwg/gorogio/style"
 )
 
-// Button 第一个 UI 单元
+// Button
+//
+// 一个有状态 UI Component。
+//
+// state: Clickable
+// event: onClick
+// render: Element()
 //
 // 对应:
 //
@@ -18,10 +24,15 @@ import (
 // Flutter: ElevatedButton
 type Button struct {
 	click widget.Clickable
-	text  string
+
+	text string
+
+	onClick func()
 }
 
-// NewButton 创建按钮
+// NewButton
+//
+// 创建 Button。
 func NewButton(
 	text string,
 ) *Button {
@@ -31,7 +42,37 @@ func NewButton(
 	}
 }
 
-// Element 根据 Theme 渲染 Button
+// OnClick
+//
+// 注册点击行为。
+func (b *Button) OnClick(
+	handler func(),
+) *Button {
+
+	b.onClick = handler
+	return b
+}
+
+// Update
+//
+// 处理输入事件。
+//
+// 每一帧调用。
+func (b *Button) Update(
+	gtx layout.Context,
+) {
+
+	for b.click.Clicked(gtx) {
+
+		if b.onClick != nil {
+			b.onClick()
+		}
+	}
+}
+
+// Element
+//
+// 构建 UI Element。
 func (b *Button) Element(
 	th *style.Theme,
 ) element.Element {
@@ -46,12 +87,4 @@ func (b *Button) Element(
 			b.text,
 		).Layout(gtx)
 	}
-}
-
-// Clicked 查询按钮是否点击
-func (b *Button) Clicked(
-	gtx layout.Context,
-) bool {
-
-	return b.click.Clicked(gtx)
 }
