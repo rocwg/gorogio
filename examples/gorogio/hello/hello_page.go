@@ -9,9 +9,16 @@ import (
 	"github.com/rocwg/gorogio/container"
 	"github.com/rocwg/gorogio/element"
 	"github.com/rocwg/gorogio/modifier"
+	"github.com/rocwg/gorogio/page"
+	"github.com/rocwg/gorogio/primitive"
 	"github.com/rocwg/gorogio/style"
-	"github.com/rocwg/gorogio/view"
 )
+
+// compile-time interface check.
+//
+// 如果 HelloPage 不满足 page.Page
+// 编译直接失败。
+var _ page.Page = (*HelloPage)(nil)
 
 // HelloPage
 //
@@ -37,27 +44,27 @@ func NewHelloPage(
 	state *CounterState,
 ) *HelloPage {
 
-	page := &HelloPage{
+	hello := &HelloPage{
 		State: state,
 	}
 
-	page.Increment =
+	hello.Increment =
 		component.NewButton("+").
 			OnClick(
 				func() {
-					page.State.Increment()
+					hello.State.Increment()
 				},
 			)
 
-	page.Reset =
+	hello.Reset =
 		component.NewButton("Reset").
 			OnClick(
 				func() {
-					page.State.Reset()
+					hello.State.Reset()
 				},
 			)
 
-	return page
+	return hello
 }
 
 // Update
@@ -100,12 +107,12 @@ func (p *HelloPage) build(
 				Alignment: layout.Middle,
 			},
 
-			view.H3(
+			primitive.H3(
 				th,
 				"Hello Gio",
 			),
 
-			view.Body(
+			primitive.Body(
 				th,
 				"Count : "+strconv.Itoa(p.State.Count),
 			),

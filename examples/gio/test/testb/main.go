@@ -11,8 +11,8 @@ import (
 	"github.com/rocwg/gorogio/container"
 	"github.com/rocwg/gorogio/element"
 	"github.com/rocwg/gorogio/modifier"
+	"github.com/rocwg/gorogio/primitive"
 	"github.com/rocwg/gorogio/style"
-	"github.com/rocwg/gorogio/view"
 )
 
 func main() {
@@ -58,12 +58,12 @@ func page(
 			Alignment: layout.Middle,
 		},
 
-		view.H3(th, "Hello Gio"),
-		view.Body(th, "Goro UI"),
+		primitive.H3(th, "Hello Gio"),
+		primitive.Body(th, "Goro UI"),
 
 		modifier.Padding(
 			30,
-			view.Body(th, "Goro UI"),
+			primitive.Body(th, "Goro UI"),
 		),
 	)
 }

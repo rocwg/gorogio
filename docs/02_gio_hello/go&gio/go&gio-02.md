@@ -27,21 +27,17 @@
 它同时承担三个角色：
 
 ```
-                    gorogio
-
+              gorogio
 
         ┌─────────────────────┐
         │                     │
         ↓                     ↓
 
-
    Go Learning Vehicle     UI Framework Experiment
-
 
         ↓                     ↓
 
-
-              Personal Prototype Engine
+        Personal Prototype Engine
 ```
 
 ------
@@ -54,25 +50,15 @@
 
 ```
 Hello
-
 ↓
-
 Counter
-
 ↓
-
 Todo
-
 ↓
-
 Calculator
-
 ↓
-
 Chat
-
 ↓
-
 结束
 ```
 
@@ -93,33 +79,19 @@ examples/hello
 
 
 Hello
-
 ↓
-
 Layout
-
 ↓
-
 Component
-
 ↓
-
 Theme
-
 ↓
-
 State
-
 ↓
-
 Interaction
-
 ↓
-
 Application
-
 ↓
-
 Prototype Engine
 ```
 
@@ -135,21 +107,13 @@ Prototype Engine
 
 ```
 Application
-
     ↓
-
 Composition
-
     ↓
-
 Component
-
     ↓
-
 Primitive
-
     ↓
-
 Runtime
 ```
 
@@ -167,33 +131,19 @@ Button
 
 ```
 Button
-
 ↓
-
 Clickable State
-
 ↓
-
 Layout
-
 ↓
-
 Text
-
 ↓
-
 Paint
-
 ↓
-
 Event
-
 ↓
-
 Input
-
 ↓
-
 GPU
 ```
 
@@ -234,25 +184,15 @@ GPU
 
 ```
 为什么 Button 是 Component？
-
 ↓
-
 Component 如何组合？
-
 ↓
-
 State 放在哪里？
-
 ↓
-
 Layout 如何计算？
-
 ↓
-
 Theme 如何注入？
-
 ↓
-
 如何形成 Design System？
 ```
 
@@ -319,17 +259,11 @@ Go：
 
 ```
 Gio Concept
-
       ↓
-
 Go Language Feature
-
       ↓
-
 Engineering Principle
-
       ↓
-
 Framework Design
 ```
 
@@ -343,17 +277,11 @@ Framework Design
 
 ```
 Declarative UI
-
 +
-
 Composition
-
 +
-
 State Driven
-
 +
-
 Modifier / Configuration
 ```
 
@@ -365,13 +293,9 @@ Modifier / Configuration
 
 ```
 View
-
 +
-
 Modifier
-
 +
-
 State
 ```
 
@@ -395,13 +319,9 @@ Modifier 链。
 
 ```
 Composable Function
-
 +
-
 Modifier
-
 +
-
 State
 ```
 
@@ -422,17 +342,11 @@ Flutter 也属于同一思想：
 
 ```
 Widget Tree
-
 +
-
 Composition
-
 +
-
 State
-
 +
-
 InheritedWidget / Theme
 ```
 
@@ -517,13 +431,9 @@ Material 3 不是 UI Framework。
 
 ```
 gorogio Design System
-
         ↑
-
 Material 3 Inspiration
-
         ↑
-
 Gio Runtime
 ```
 
@@ -600,17 +510,11 @@ Gio Runtime
 
 ```
 Gio
-
 ↓
-
 gorogio
-
 ↓
-
 My Personal UI Kit
-
 ↓
-
 My Personal Tools
 ```
 

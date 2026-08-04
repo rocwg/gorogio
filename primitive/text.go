@@ -1,4 +1,4 @@
-package view
+package primitive
 
 import (
 	"gioui.org/layout"

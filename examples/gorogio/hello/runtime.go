@@ -6,6 +6,8 @@ import (
 
 	"gioui.org/app"
 	"gioui.org/op"
+
+	gorogioapp "github.com/rocwg/gorogio/app"
 )
 
 func Run() {
@@ -23,10 +25,21 @@ func Run() {
 	app.Main()
 }
 
+//Frame
+//  ↓
+//Update()
+//  ↓
+//Draw()
+//  ↓
+//Present
+
 func runWindow(
 	w *app.Window,
 ) error {
-	application := NewApplication()
+	state := &CounterState{}
+	page := NewHelloPage(state)
+	application := gorogioapp.New(page)
+
 	var ops op.Ops
 
 	for {
