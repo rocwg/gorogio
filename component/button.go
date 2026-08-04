@@ -9,6 +9,8 @@ import (
 	"github.com/rocwg/gorogio/style"
 )
 
+var _ Component = (*Button)(nil)
+
 // Button
 //
 // 一个有状态 UI Component。
@@ -70,10 +72,10 @@ func (b *Button) Update(
 	}
 }
 
-// Element
+// Build
 //
 // 构建 UI Element。
-func (b *Button) Element(
+func (b *Button) Build(
 	th *style.Theme,
 ) element.Element {
 

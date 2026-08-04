@@ -7,6 +7,8 @@ import (
 	"github.com/rocwg/gorogio/style"
 )
 
+// Page 是 Application 管理的页面生命周期对象。
+
 // Page
 //
 // 页面生命周期协议。
@@ -38,6 +40,7 @@ type Page interface {
 	// Element
 	//
 	// 返回 UI Element Tree。
+	// 一个页面最终呈现为什么 Element Tree。
 	Element(
 		th *style.Theme,
 	) element.Element

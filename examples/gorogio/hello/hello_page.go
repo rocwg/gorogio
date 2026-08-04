@@ -123,9 +123,9 @@ func (p *HelloPage) build(
 					Spacing: th.Spacing.Large,
 				},
 
-				p.Increment.Element(th),
+				p.Increment.Build(th),
 
-				p.Reset.Element(th),
+				p.Reset.Build(th),
 			),
 		),
 	)
