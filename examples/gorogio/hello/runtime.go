@@ -38,6 +38,8 @@ func runWindow(
 		case app.FrameEvent:
 			gtx := app.NewContext(&ops, e)
 
+			application.Update(gtx)
+
 			application.Draw(gtx)
 
 			e.Frame(gtx.Ops)

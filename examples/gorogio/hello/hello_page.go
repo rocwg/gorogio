@@ -13,6 +13,16 @@ import (
 	"github.com/rocwg/gorogio/view"
 )
 
+// HelloPage
+//
+// 页面对象。
+//
+// 负责:
+//
+// 1. 页面状态
+// 2. 页面事件
+// 3. 页面 UI
+
 type HelloPage struct {
 	State *CounterState
 
@@ -20,6 +30,9 @@ type HelloPage struct {
 	Reset     *component.Button
 }
 
+// NewHelloPage
+//
+// 创建页面。
 func NewHelloPage(
 	state *CounterState,
 ) *HelloPage {
@@ -47,37 +60,64 @@ func NewHelloPage(
 	return page
 }
 
-// Event 层
-
 // Update
 //
-// 处理页面输入事件。
+// 生命周期:
+//
+// Application
+//
+//	|
+//	v
+//
+// Page.Update()
+//
+// 处理输入事件。
 func (p *HelloPage) Update(
 	gtx layout.Context,
 ) {
+
 	p.Increment.Update(gtx)
+
 	p.Reset.Update(gtx)
+
 }
 
-// View 层
-func (p *HelloPage) View(
+// build
+//
+// 构建 UI Tree。
+func (p *HelloPage) build(
 	th *style.Theme,
 ) element.Element {
 
 	return modifier.Padding(
+
 		40,
+
 		container.Column(
+
 			container.Options{
 				Spacing:   th.Spacing.Large,
 				Alignment: layout.Middle,
 			},
-			view.H3(th, "Hello Gio"),
-			view.Body(th, "Count : "+strconv.Itoa(p.State.Count)),
+
+			view.H3(
+				th,
+				"Hello Gio",
+			),
+
+			view.Body(
+				th,
+				"Count : "+strconv.Itoa(p.State.Count),
+			),
+
 			container.Row(
+
 				container.Options{
 					Spacing: th.Spacing.Large,
 				},
+
 				p.Increment.Element(th),
+
 				p.Reset.Element(th),
 			),
 		),
@@ -86,18 +126,15 @@ func (p *HelloPage) View(
 
 // Element
 //
-// 构建页面 Element Tree。
+// Page 对外暴露的 UI Element。
+//
+// 注意:
+//
+// 不负责 Update。
+// 只负责 UI。
 func (p *HelloPage) Element(
 	th *style.Theme,
 ) element.Element {
 
-	return func(
-		gtx layout.Context,
-	) layout.Dimensions {
-
-		// 先处理事件，再渲染 UI。
-		p.Update(gtx)
-
-		return p.View(th)(gtx)
-	}
+	return p.build(th)
 }

@@ -23,6 +23,20 @@ func NewApplication() *Application {
 	}
 }
 
+// Update
+//
+// Application 生命周期第一步。
+func (a *Application) Update(
+	gtx layout.Context,
+) {
+
+	a.Page.Update(gtx)
+
+}
+
+// Draw
+//
+// Application 生命周期第二步。
 func (a *Application) Draw(
 	gtx layout.Context,
 ) {
