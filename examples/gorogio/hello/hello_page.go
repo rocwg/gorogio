@@ -1,7 +1,11 @@
 package main
 
 import (
+	"strconv"
+
 	"gioui.org/layout"
+
+	"github.com/rocwg/gorogio/component"
 	"github.com/rocwg/gorogio/container"
 	"github.com/rocwg/gorogio/element"
 	"github.com/rocwg/gorogio/modifier"
@@ -11,6 +15,9 @@ import (
 
 type HelloPage struct {
 	State *CounterState
+
+	Increment *component.Button
+	Reset     *component.Button
 }
 
 func NewHelloPage(
@@ -19,9 +26,30 @@ func NewHelloPage(
 
 	return &HelloPage{
 		State: state,
+
+		Increment: component.NewButton("+"),
+		Reset:     component.NewButton("Reset"),
 	}
 }
 
+// update
+//
+// 处理页面事件。
+func (p *HelloPage) update(
+	gtx layout.Context,
+) {
+
+	if p.Increment.Clicked(gtx) {
+		p.State.Increment()
+	}
+	if p.Reset.Clicked(gtx) {
+		p.State.Reset()
+	}
+}
+
+// Element
+//
+// 构建页面 Element Tree。
 func (p *HelloPage) Element(
 	th *style.Theme,
 ) element.Element {
@@ -30,11 +58,18 @@ func (p *HelloPage) Element(
 		40,
 		container.Column(
 			container.Options{
-				Spacing:   50,
+				Spacing:   th.Spacing.Large,
 				Alignment: layout.Middle,
 			},
-			view.Text(th, "Hello Gio"),
-			view.Text(th, "Goro UI"),
+			view.H3(th, "Hello Gio"),
+			view.Body(th, "Count : "+strconv.Itoa(p.State.Count)),
+			container.Row(
+				container.Options{
+					Spacing: th.Spacing.Large,
+				},
+				p.Increment.Element(th),
+				p.Reset.Element(th),
+			),
 		),
 	)
 }

@@ -58,12 +58,12 @@ func page(
 			Alignment: layout.Middle,
 		},
 
-		view.Text(th, "Hello Gio"),
-		view.Text(th, "Goro UI"),
+		view.H3(th, "Hello Gio"),
+		view.Body(th, "Goro UI"),
 
 		modifier.Padding(
 			30,
-			view.Text(th, "Goro UI"),
+			view.Body(th, "Goro UI"),
 		),
 	)
 }

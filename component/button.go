@@ -17,32 +17,31 @@ import (
 // SwiftUI: Button
 // Flutter: ElevatedButton
 type Button struct {
-	theme *style.Theme
 	click widget.Clickable
 	text  string
 }
 
 // NewButton 创建按钮
 func NewButton(
-	theme *style.Theme,
 	text string,
 ) *Button {
 
 	return &Button{
-		theme: theme,
-		text:  text,
+		text: text,
 	}
 }
 
-// Element ？
-func (b *Button) Element() element.Element {
+// Element 根据 Theme 渲染 Button
+func (b *Button) Element(
+	th *style.Theme,
+) element.Element {
 
 	return func(
 		gtx layout.Context,
 	) layout.Dimensions {
 
 		return material.Button(
-			b.theme.Material,
+			th.Material,
 			&b.click,
 			b.text,
 		).Layout(gtx)
