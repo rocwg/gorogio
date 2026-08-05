@@ -14,7 +14,5 @@ import (
 type Component interface {
 
 	// Build 构建组件 UI。
-	Build(
-		th *style.Theme,
-	) element.Element
+	Build(th *style.Theme) element.Element
 }
