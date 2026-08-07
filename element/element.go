@@ -6,7 +6,7 @@ import (
 
 // Element
 //
-// goro-ui 的核心 UI 元素协议。
+// 核心 UI 元素协议。
 //
 // 类似：
 //

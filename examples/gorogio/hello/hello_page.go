@@ -3,20 +3,20 @@ package main
 import (
 	"gioui.org/layout"
 
+	"github.com/rocwg/gorogio/app"
 	"github.com/rocwg/gorogio/component"
 	"github.com/rocwg/gorogio/container"
 	"github.com/rocwg/gorogio/element"
 	"github.com/rocwg/gorogio/modifier"
-	"github.com/rocwg/gorogio/page"
 	"github.com/rocwg/gorogio/primitive"
 	"github.com/rocwg/gorogio/style"
 )
 
 // compile-time interface check.
 //
-// 如果 HelloPage 不满足 page.Page
+// 如果 HelloPage 不满足 app.Screen
 // 编译直接失败。
-var _ page.Page = (*HelloPage)(nil)
+var _ app.Screen = (*HelloPage)(nil)
 
 // HelloPage
 //

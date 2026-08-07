@@ -3,22 +3,21 @@ package app
 import (
 	"gioui.org/layout"
 
-	"github.com/rocwg/gorogio/page"
 	"github.com/rocwg/gorogio/style"
 )
 
 type Application struct {
-	Theme *style.Theme
-	Page  page.Page
+	Theme  *style.Theme
+	Screen Screen
 }
 
 func New(
-	page page.Page,
+	page Screen,
 ) *Application {
 
 	return &Application{
-		Theme: style.NewTheme(),
-		Page:  page,
+		Theme:  style.NewTheme(),
+		Screen: page,
 	}
 }
 
@@ -28,9 +27,7 @@ func New(
 func (a *Application) Update(
 	gtx layout.Context,
 ) {
-
-	a.Page.Update(gtx)
-
+	a.Screen.Update(gtx)
 }
 
 // Draw
@@ -39,9 +36,7 @@ func (a *Application) Update(
 func (a *Application) Draw(
 	gtx layout.Context,
 ) {
-
-	// 2. Render
-	root := a.Page.Element(a.Theme)
-
-	root(gtx) //:最关键
+	//Render
+	root := a.Screen.Element(a.Theme)
+	root(gtx) //最关键
 }

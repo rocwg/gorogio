@@ -1,4 +1,4 @@
-package page
+package app
 
 import (
 	"gioui.org/layout"
@@ -7,7 +7,7 @@ import (
 	"github.com/rocwg/gorogio/style"
 )
 
-// Page 是 Application 管理的页面生命周期对象。
+// Screen 是 Application 管理的页面生命周期对象。
 //
 // 页面生命周期协议。
 //
@@ -16,7 +16,7 @@ import (
 //  2. Element 构建 UI Tree。
 //
 // Application 不关心具体页面实现。
-type Page interface {
+type Screen interface {
 
 	// Update 每一帧调用。
 	//
@@ -24,14 +24,10 @@ type Page interface {
 	// - Button Click
 	// - Input Event
 	// - State Change
-	Update(
-		gtx layout.Context,
-	)
+	Update(gtx layout.Context)
 
 	// Element 返回 UI Element Tree。
 	//
 	// 一个页面的最终呈现
-	Element(
-		th *style.Theme,
-	) element.Element
+	Element(th *style.Theme) element.Element
 }
