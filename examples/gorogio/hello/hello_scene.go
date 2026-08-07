@@ -14,9 +14,9 @@ import (
 
 // compile-time interface check.
 //
-// 如果 HelloPage 不满足 app.Screen
+// 如果 HelloScreen 不满足 app.Scene
 // 编译直接失败。
-var _ app.Screen = (*HelloPage)(nil)
+var _ app.Scene = (*HelloScreen)(nil)
 
 // HelloPage
 //
@@ -28,16 +28,16 @@ var _ app.Screen = (*HelloPage)(nil)
 // 2. 页面事件
 // 3. 页面 UI
 
-type HelloPage struct {
+type HelloScreen struct {
 	Counter *component.Counter
 }
 
 // NewHelloPage
 //
 // 创建页面。
-func NewHelloPage() *HelloPage {
+func NewHelloPage() *HelloScreen {
 
-	return &HelloPage{
+	return &HelloScreen{
 		Counter: component.NewCounter(),
 	}
 }
@@ -47,16 +47,16 @@ func NewHelloPage() *HelloPage {
 // 生命周期: Application -> Page.Update()
 //
 // 处理输入事件。
-func (p *HelloPage) Update(
+func (h *HelloScreen) Update(
 	gtx layout.Context,
 ) {
-	p.Counter.Update(gtx)
+	h.Counter.Update(gtx)
 }
 
 // build
 //
 // 构建 UI Tree。
-func (p *HelloPage) build(
+func (h *HelloScreen) build(
 	th *style.Theme,
 ) element.Element {
 
@@ -76,7 +76,7 @@ func (p *HelloPage) build(
 				"Hello Gio",
 			),
 
-			p.Counter.Element(th),
+			h.Counter.Element(th),
 		),
 	)
 }
@@ -89,9 +89,13 @@ func (p *HelloPage) build(
 //
 // 不负责 Update。
 // 只负责 UI。
-func (p *HelloPage) Element(
+func (h *HelloScreen) Element(
 	th *style.Theme,
 ) element.Element {
 
-	return p.build(th)
+	return h.build(th)
+}
+
+func (h *HelloScreen) Name() string {
+	return "hello"
 }

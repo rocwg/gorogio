@@ -14,7 +14,7 @@ import (
 	"github.com/rocwg/gorogio/style"
 )
 
-var _ app.Screen = (*SettingsScreen)(nil)
+var _ app.Scene = (*SettingsScreen)(nil)
 
 type SettingsScreen struct {
 	DarkMode *component.Checkbox
@@ -65,4 +65,8 @@ func (s *SettingsScreen) Element(
 			s.Save.Element(th),
 		),
 	)
+}
+
+func (s *SettingsScreen) Name() string {
+	return "settings"
 }

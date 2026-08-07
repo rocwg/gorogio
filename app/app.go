@@ -7,17 +7,17 @@ import (
 )
 
 type Application struct {
-	Theme  *style.Theme
-	Screen Screen
+	Theme *style.Theme
+	Scene Scene
 }
 
 func New(
-	page Screen,
+	scene Scene,
 ) *Application {
 
 	return &Application{
-		Theme:  style.NewTheme(),
-		Screen: page,
+		Theme: style.NewTheme(),
+		Scene: scene,
 	}
 }
 
@@ -27,7 +27,7 @@ func New(
 func (a *Application) Update(
 	gtx layout.Context,
 ) {
-	a.Screen.Update(gtx)
+	a.Scene.Update(gtx)
 }
 
 // Draw
@@ -37,6 +37,6 @@ func (a *Application) Draw(
 	gtx layout.Context,
 ) {
 	//Render
-	root := a.Screen.Element(a.Theme)
+	root := a.Scene.Element(a.Theme)
 	root(gtx) //最关键
 }

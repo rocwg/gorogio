@@ -26,15 +26,13 @@ type Input struct {
 	editor widget.Editor
 
 	// 显示提示
-	label string
+	hint string
 }
 
 // NewInput 创建输入框
-func NewInput(
-	label string,
-) *Input {
+func NewInput(hint string) *Input {
 	return &Input{
-		label:  label,
+		hint:   hint,
 		editor: widget.Editor{},
 	}
 }
@@ -67,7 +65,7 @@ func (i *Input) Element(
 		return material.Editor(
 			th.Material,
 			&i.editor,
-			i.label,
+			i.hint,
 		).Layout(gtx)
 	}
 }
