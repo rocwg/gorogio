@@ -14,6 +14,10 @@ master 收到。🙂
 
 ------
 
+
+
+### ==A0== 
+
 ## 一、ADR-0006 Component State Model
 
 建议文件：
@@ -575,4 +579,628 @@ type Screen interface {
 
 component/component.go
 ```
+
+
+
+### ==A1== 
+
+rocwg，收到。😊
+以后我就这样称呼你。
+
+另外，你这次关于 `Spacer` 的判断，我认为**非常值得调整**，而且这是一个很好的 framework 设计思考点。
+
+你不是简单移动文件，而是在回答：
+
+> “一个 UI 概念，它属于什么层？”
+
+这个问题比写代码重要。
+
+------
+
+## 1. Spacer 放入 container，我赞成
+
+你的新理解：
+
+> Spacer 是空间控制。
+
+这是关键。
+
+重新看 gorogio 当前分层：
+
+```
+gorogio
+
+├── primitive
+│   ├── Text
+│   ├── Icon
+│   └── Divider
+│
+├── component
+│   ├── Button
+│   ├── Input
+│   └── Counter
+│
+├── container
+│   ├── Row
+│   ├── Column
+│   ├── Stack
+│   └── Center
+│
+├── modifier
+│   └── Padding
+```
+
+其实：
+
+```
+primitive
+```
+
+应该偏向：
+
+> 最小视觉表达。
+
+例如：
+
+- Text
+- Icon
+- Divider
+
+它们回答：
+
+> “显示什么？”
+
+------
+
+而：
+
+```
+container
+```
+
+回答：
+
+> “如何组织空间？”
+
+所以：
+
+- Row
+- Column
+- Stack
+- Center
+- Spacer
+
+天然是一类。
+
+------
+
+## 2. 我建议的目录调整
+
+从：
+
+```
+primitive
+
+└── space.go
+```
+
+移动：
+
+```
+container
+
+├── row.go
+├── column.go
+├── stack.go
+├── center.go
+├── expand.go
+└── spacer.go
+```
+
+更加符合语义。
+
+------
+
+## 3. container/spacer.go 怎么设计？
+
+我建议不要保留：
+
+```go
+Spacer()
+SpacerWidth()
+```
+
+因为方向泄漏。
+
+container 可以提供：
+
+```go
+VerticalSpace()
+HorizontalSpace()
+```
+
+例如：
+
+```go
+package container
+
+import (
+	"gioui.org/layout"
+	"gioui.org/unit"
+
+	"github.com/rocwg/gorogio/element"
+)
+
+
+// VerticalSpace
+//
+// 垂直方向占据固定空间。
+func VerticalSpace(
+	height unit.Dp,
+) element.Element {
+
+	return func(
+		gtx layout.Context,
+	) layout.Dimensions {
+
+		return layout.Spacer{
+			Height: height,
+		}.Layout(gtx)
+	}
+}
+
+
+// HorizontalSpace
+//
+// 水平方向占据固定空间。
+func HorizontalSpace(
+	width unit.Dp,
+) element.Element {
+
+	return func(
+		gtx layout.Context,
+	) layout.Dimensions {
+
+		return layout.Spacer{
+			Width: width,
+		}.Layout(gtx)
+	}
+}
+```
+
+------
+
+## 4. 但是我建议你不要叫 Space？
+
+这里有一点小设计讨论。
+
+Compose：
+
+```kotlin
+Spacer()
+```
+
+Flutter：
+
+```dart
+SizedBox()
+```
+
+SwiftUI：
+
+```swift
+Spacer()
+```
+
+所以：
+
+```
+VerticalSpace
+```
+
+其实是我们为了 Go API 可读性做的调整。
+
+我觉得目前可以。
+
+因为：
+
+Go 喜欢：
+
+```go
+http.ListenAndServe()
+
+time.After()
+
+strings.Builder
+```
+
+明确优先。
+
+------
+
+## 5. 移动后，验证什么？
+
+不要只看编译。
+
+你应该验证：
+
+### hello
+
+修改：
+
+```go
+container.Column(
+    options,
+
+    primitive.H3(
+        th,
+        "Hello Gio",
+    ),
+
+
+    container.VerticalSpace(
+        20,
+    ),
+
+
+    primitive.Body(
+        th,
+        "Count",
+    ),
+)
+```
+
+------
+
+### forms
+
+例如：
+
+```go
+container.Column(
+    options,
+
+    primitive.H3(
+        th,
+        "User Profile",
+    ),
+
+    primitive.Divider(th),
+
+
+    container.VerticalSpace(
+        16,
+    ),
+
+
+    f.UserName.Element(th),
+)
+```
+
+观察：
+
+Spacer 放入 container 后，代码阅读是否更自然。
+
+------
+
+## 6. 顺便评价一下你今天的架构变化
+
+今天其实发生了一件事情：
+
+早期：
+
+```
+primitive
+    ↓
+所有基础东西
+```
+
+现在：
+
+```
+primitive
+
+    视觉原子
+
+
+container
+
+    空间原子
+
+
+component
+
+    行为原子
+```
+
+这已经开始接近：
+
+```
+Design System
+```
+
+的思想。
+
+------
+
+## 7. 今天最后建议
+
+不要继续扩展。
+
+完成：
+
+```
+refactor(container): move Spacer from primitive
+```
+
+然后 commit。
+
+你的今天路线：
+
+```
+Input
+ ↓
+FormField
+ ↓
+Screen
+ ↓
+Center
+ ↓
+Divider
+ ↓
+Spacer 分类调整
+```
+
+其实已经形成一个非常完整的小闭环。
+
+------
+
+最后补充一句：
+
+你之前说：
+
+> “master”
+
+不用这么称呼啦 😄
+
+你是 `rocwg`，你的仓库：
+
+```
+github.com/rocwg/gorogio
+```
+
+未来这个项目真正重要的是：
+
+```
+rocwg 的设计决策历史
+```
+
+不是某个人的指导。
+
+我更希望你慢慢形成：
+
+```
+rocwg UI Philosophy
+
+=
+Gio Runtime
++
+Go Simplicity
++
+Your Design Decisions
+```
+
+这才是这个项目十年后的价值。👍
+
+
+
+### ==A2== 
+
+好的，rocwg。😊
+
+今天这一轮其实完成得非常扎实，可以安心去赶地铁了。
+
+如果把今天的成果压缩成一句话：
+
+> 你不是“又写了几个 Gio Demo”，而是在用 Gio 练 Go，同时开始形成自己的 UI 资产边界。
+
+今天真正留下来的东西：
+
+```text
+gorogio
+
+app
+ └── Screen 生命周期协议
+
+component
+ ├── Button
+ ├── Input
+ ├── Counter
+ └── FormField
+
+container
+ ├── Row
+ ├── Column
+ ├── Stack
+ ├── Center
+ └── Spacer（准备迁移）
+
+primitive
+ ├── Text
+ ├── Icon
+ └── Divider
+
+modifier
+ └── Padding
+
+style
+ └── Theme / Design Token
+```
+
+更重要的是几个设计判断：
+
+1. **Screen 和 Component 保持独立协议**
+
+你没有为了“统一漂亮”而强行抽象。
+
+这是 Go 思维。
+
+------
+
+1. **Component 拥有自己的状态**
+
+例如：
+
+```go
+type Input struct {
+    editor widget.Editor
+}
+```
+
+而不是：
+
+```go
+Screen 保存所有状态
+Component 只是无状态 View
+```
+
+你已经开始理解 Immediate Mode 下的状态归属。
+
+------
+
+1. **Spacer 放 container**
+
+这个判断很好。
+
+因为你开始从：
+
+> “Gio 有什么 API？”
+
+转向：
+
+> “这个概念应该属于我的哪个抽象层？”
+
+这是 framework 设计的关键。
+
+------
+
+1. 地铁时间建议不要继续编码
+
+今天不要开新任务。
+
+如果想利用路上时间，可以做三个轻量动作：
+
+### ① 看今天 git log
+
+例如：
+
+```bash
+git log --oneline --decorate -10
+```
+
+看看自己的设计演进。
+
+------
+
+### ② 在脑子里复盘：
+
+```text
+FrameEvent
+    ↓
+Application.Update
+    ↓
+Screen.Update
+    ↓
+Component.Update
+
+Application.Draw
+    ↓
+Screen.Element
+    ↓
+Element Tree
+    ↓
+Gio Layout
+    ↓
+GPU Render
+```
+
+这条链你已经真正跑通了。
+
+------
+
+### ③ 想一个问题（不用马上回答）
+
+以后：
+
+```go
+Button
+Input
+Checkbox
+Counter
+FormField
+```
+
+越来越多以后：
+
+component 包怎么办？
+
+例如：
+
+```text
+component
+
+button.go
+input.go
+checkbox.go
+counter.go
+form_field.go
+table.go
+dialog.go
+...
+```
+
+什么时候需要：
+
+```text
+component/
+    button/
+    input/
+    form/
+```
+
+什么时候不需要？
+
+这个问题以后会自然出现。
+
+------
+
+rocwg，今天这次从：
+
+```text
+Hello Gio
+```
+
+走到了：
+
+```text
+gorogio UI Framework v0.3.x
+```
+
+这个跨度其实不小。
+
+路上注意安全，明天继续时，我们可以从今天最后留下的两个方向选择：
+
+1. **完成 Spacer 迁移 + primitive/container 边界冻结**
+
+或者：
+
+1. **进入 ADR-0005 Component Lifecycle Ownership**
+
+正式讨论：
+
+> 状态到底属于 Screen，还是 Component？
+
+这个问题会影响 gorogio 后续几年设计。👍
+
+祝地铁顺利。🚇
 

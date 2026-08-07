@@ -98,6 +98,8 @@ func (f *FormScreen) Element(
 
 			primitive.Divider(th),
 
+			container.VerticalSpace(16),
+
 			f.UserName.Element(th),
 			f.Age.Element(th),
 			f.City.Element(th),

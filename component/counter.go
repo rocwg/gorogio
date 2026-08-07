@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"gioui.org/layout"
+	"gioui.org/unit"
 
 	"github.com/rocwg/gorogio/container"
 	"github.com/rocwg/gorogio/element"
@@ -76,6 +77,10 @@ func (c *Counter) Element(
 				Spacing: th.Spacing.Large,
 			},
 			c.increment.Element(th),
+
+			container.HorizontalSpace(
+				unit.Dp(10),
+			),
 			c.reset.Element(th),
 		),
 	)

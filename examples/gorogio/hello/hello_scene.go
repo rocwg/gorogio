@@ -2,6 +2,7 @@ package main
 
 import (
 	"gioui.org/layout"
+	"gioui.org/unit"
 
 	"github.com/rocwg/gorogio/app"
 	"github.com/rocwg/gorogio/component"
@@ -76,6 +77,10 @@ func (h *HelloScreen) build(
 				primitive.H3(
 					th,
 					"Hello Gio",
+				),
+
+				container.VerticalSpace(
+					unit.Dp(20),
 				),
 
 				h.Counter.Element(th),

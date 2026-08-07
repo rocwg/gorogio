@@ -1,4 +1,4 @@
-package primitive
+package container
 
 import (
 	"gioui.org/layout"
@@ -7,7 +7,14 @@ import (
 	"github.com/rocwg/gorogio/element"
 )
 
-func Spacer(
+// VerticalSpace
+//
+// 垂直方向占用空间。
+//
+// 类似:
+// Compose: Spacer(height)
+// SwiftUI: Spacer()
+func VerticalSpace(
 	height unit.Dp,
 ) element.Element {
 
@@ -21,7 +28,10 @@ func Spacer(
 	}
 }
 
-func SpacerWidth(
+// HorizontalSpace
+//
+// 水平方向占据固定空间。
+func HorizontalSpace(
 	width unit.Dp,
 ) element.Element {
 
