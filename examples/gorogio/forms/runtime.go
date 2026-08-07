@@ -14,7 +14,7 @@ func Run() {
 	go func() {
 		w := new(app.Window)
 		w.Option(
-			app.Title("Gio"),
+			app.Title("Gio: User form"),
 		)
 		err := runWindow(w)
 		if err != nil {

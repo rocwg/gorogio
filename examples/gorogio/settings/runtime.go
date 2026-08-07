@@ -14,7 +14,7 @@ func Run() {
 	go func() {
 		w := new(app.Window)
 		w.Option(
-			app.Title("Gio: Hello counter"),
+			app.Title("Gio: Settings"),
 		)
 		err := runWindow(w)
 		if err != nil {
@@ -36,7 +36,7 @@ func Run() {
 func runWindow(
 	w *app.Window,
 ) error {
-	page := NewHelloPage()
+	page := NewSettingsScreen()
 	application := gorogioapp.New(page)
 
 	var ops op.Ops
