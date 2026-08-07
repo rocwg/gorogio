@@ -60,23 +60,26 @@ func (h *HelloScreen) build(
 	th *style.Theme,
 ) element.Element {
 
-	return modifier.Padding(
+	return container.Center(
 
-		40,
+		modifier.Padding(
 
-		container.Column(
+			40,
 
-			container.Options{
-				Spacing:   th.Spacing.Large,
-				Alignment: layout.Middle,
-			},
+			container.Column(
 
-			primitive.H3(
-				th,
-				"Hello Gio",
+				container.Options{
+					Spacing:   th.Spacing.Large,
+					Alignment: layout.Middle,
+				},
+
+				primitive.H3(
+					th,
+					"Hello Gio",
+				),
+
+				h.Counter.Element(th),
 			),
-
-			h.Counter.Element(th),
 		),
 	)
 }

@@ -551,3 +551,28 @@ type Component interface {
 ```
 
 这会是 gorogio 第一个真正的“框架接口设计”节点。🙂
+
+
+
+
+
+```powershell
+type Screen interface {
+
+	// Update 每一帧调用。
+	//
+	// 负责:
+	// - Button Click
+	// - Input Event
+	// - State Change
+	Update(gtx layout.Context)
+
+	// Element 返回 UI Element Tree。
+	//
+	// 一个页面的最终呈现
+	Element(th *style.Theme) element.Element
+}
+
+component/component.go
+```
+

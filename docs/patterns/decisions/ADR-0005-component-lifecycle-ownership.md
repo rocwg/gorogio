@@ -656,3 +656,601 @@ docs/adr/ADR-0005-component-lifecycle-ownership.md
 
 现在 gorogio 已经开始像一个真正的小型工程了。🙂
 
+
+
+### ==A1==
+
+master，非常好。👍
+
+我认为现在**正式进入 ADR-0005 是正确时机**。
+
+而且我想强调一下：
+
+这不是“为了写文档而写 ADR”。
+
+你刚刚完成：
+
+```
+Input
+ ↓
+FormField
+ ↓
+FormScreen
+```
+
+之后，自然产生了一个真实工程问题：
+
+> FormField 内部拥有 Input，那么状态到底应该属于谁？
+
+这个问题如果不回答，后面的：
+
+- Checkbox
+- Select
+- Dialog
+- Table
+- Tree
+- Tabs
+- Navigation
+
+都会不断重复遇到。
+
+所以 ADR-0005 正好。
+
+------
+
+# ADR-0005 Component Lifecycle Ownership
+
+我建议标题：
+
+```text
+ADR-0005: Component Lifecycle Ownership
+```
+
+中文：
+
+```text
+组件生命周期与状态所有权设计
+```
+
+------
+
+# 1. Context（背景）
+
+当前 gorogio v0.3.x：
+
+结构：
+
+```
+Application
+    |
+    |
+ Screen
+    |
+    |
+ Component
+    |
+    |
+ Gio Widget
+```
+
+例如：
+
+```
+FormScreen
+
+    FormField
+
+        Input
+
+            widget.Editor
+```
+
+目前状态：
+
+```
+Input owns Editor state
+```
+
+也就是：
+
+```go
+type Input struct {
+
+    editor widget.Editor
+
+}
+```
+
+Input 自己管理：
+
+- 输入内容
+- 光标
+- selection
+- focus
+
+------
+
+# 2. 问题
+
+随着组件增加，会遇到：
+
+## 问题 A
+
+组件内部状态：
+
+例如：
+
+```go
+type Checkbox struct {
+
+    checked bool
+
+}
+```
+
+谁负责：
+
+```go
+checked=true
+```
+
+？
+
+------
+
+## 问题 B
+
+Screen 是否应该知道：
+
+```go
+checkbox.checked
+```
+
+？
+
+------
+
+## 问题 C
+
+是否应该支持：
+
+类似 React：
+
+```text
+Controlled Component
+```
+
+？
+
+例如：
+
+```go
+Input(
+    Value:"hello",
+    OnChange:func(v string)
+)
+```
+
+------
+
+# 3. 候选方案
+
+------
+
+# Option A
+
+## Component Owns State
+
+组件拥有状态。
+
+模型：
+
+```
+Screen
+
+    Button
+
+    Input
+        |
+        editor state
+
+
+    Checkbox
+        |
+        checked state
+```
+
+代码：
+
+```go
+type Checkbox struct {
+
+    checked bool
+
+}
+```
+
+使用：
+
+```go
+checkbox.Toggle()
+```
+
+------
+
+优点：
+
+符合 Gio。
+
+原因：
+
+Gio 本身：
+
+```go
+widget.Clickable
+
+widget.Editor
+
+widget.List
+```
+
+都是：
+
+对象持有状态。
+
+非常 Go。
+
+------
+
+缺点：
+
+外部控制稍弱。
+
+例如：
+
+表单初始化：
+
+需要：
+
+```go
+input.SetValue()
+```
+
+------
+
+# Option B
+
+## Screen Owns State
+
+状态提升。
+
+类似 React：
+
+```
+Screen
+
+    username string
+
+
+        Input
+```
+
+代码：
+
+```go
+type Input struct {
+
+    Value string
+
+}
+```
+
+使用：
+
+```go
+Input{
+    Value:screen.Name,
+}
+```
+
+优点：
+
+数据流清晰。
+
+缺点：
+
+Go/Gio 下会变复杂。
+
+尤其：
+
+每个 widget：
+
+都需要同步。
+
+------
+
+# Option C
+
+## Hybrid
+
+混合模式。
+
+基础组件：
+
+Component owns state。
+
+高级场景：
+
+支持 controlled。
+
+例如：
+
+普通：
+
+```go
+input := component.NewInput()
+```
+
+内部：
+
+```
+editor
+```
+
+------
+
+高级：
+
+```go
+input.Bind(&username)
+```
+
+------
+
+# 我的建议
+
+gorogio 当前阶段：
+
+## 选择：
+
+# Option A
+
+Component Owns State
+
+原因：
+
+非常符合你的目标：
+
+> Learning Go Through Gio
+
+------
+
+因为你现在不是做：
+
+React clone。
+
+你是在学习：
+
+```
+Go
+ +
+ Gio Immediate Mode
+```
+
+------
+
+Gio 的哲学：
+
+不是：
+
+```
+State
+ ↓
+Render
+```
+
+而是：
+
+```
+Object
+ |
+ owns state
+ |
+ participates in frame
+```
+
+------
+
+# 4. Decision（决定）
+
+建议 ADR 写：
+
+------
+
+## Decision
+
+gorogio v0.3.x 采用：
+
+```
+Component Owned State Model
+```
+
+原则：
+
+1. Component 拥有内部交互状态。
+2. Screen 负责组合 Component。
+3. Screen 不直接操作 Component 内部字段。
+4. Component 对外暴露语义方法。
+
+例如：
+
+正确：
+
+```go
+input.SetValue("")
+```
+
+不允许：
+
+```go
+input.editor.SetText("")
+```
+
+------
+
+Checkbox:
+
+正确：
+
+```go
+checkbox.SetChecked(true)
+```
+
+不允许：
+
+```go
+checkbox.checked=true
+```
+
+------
+
+# 5. Consequences（影响）
+
+## 好处
+
+Component:
+
+更加独立。
+
+例如：
+
+```go
+component.Input
+```
+
+可以迁移到：
+
+其他 Screen。
+
+------
+
+## 代价
+
+复杂表单：
+
+可能需要更多 API。
+
+例如：
+
+```go
+form.Reset()
+```
+
+需要：
+
+```
+Screen
+    ↓
+Component
+    ↓
+SetValue
+```
+
+------
+
+# 6. Future
+
+不要现在做。
+
+但是记录：
+
+未来 v1.x：
+
+可能增加：
+
+```
+Controlled Component
+```
+
+例如：
+
+```go
+InputOptions{
+
+    Value string
+
+    OnChange func(string)
+
+}
+```
+
+------
+
+# 我建议你的 ADR 最终结论：
+
+一句话：
+
+> gorogio follows Gio's state ownership philosophy. Components own their interaction state, while Screens own composition and business flow.
+
+------
+
+# 然后 ADR 完成后，下一步编码路线：
+
+我建议：
+
+不要马上 Checkbox。
+
+顺序：
+
+```
+ADR-0005
+   |
+   |
+component Checkbox
+   |
+   |
+settings Screen
+   |
+   |
+发现新的状态问题
+   |
+   |
+ADR-0006
+```
+
+因为：
+
+Checkbox 是最小状态组件：
+
+```go
+checked bool
+```
+
+它会验证 ADR-0005。
+
+------
+
+master，你现在 gorogio 的路线其实已经出现一个很好的节奏：
+
+```
+v0.2
+Gio封装
+
+v0.3
+Component模型
+
+v0.3.4
+Component组合
+
+v0.4
+状态模型
+
+v0.5
+页面导航
+
+...
+```
+
+不要急。
+
+今天 FormField 这一小步，已经让 gorogio 从“Gio wrapper”开始变成“小型 UI runtime 设计实验”。这一步很关键。👍
