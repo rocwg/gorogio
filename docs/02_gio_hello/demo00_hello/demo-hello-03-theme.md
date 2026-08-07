@@ -136,11 +136,8 @@ Theme
 
 ```go
 type Context struct {
-
     Layout layout.Context
-
     Theme *style.Theme
-
 }
 ```
 
@@ -168,17 +165,11 @@ func Text(
 func(gtx element.Context) layout.Dimensions {
 
     return material.Body1(
-
         gtx.Theme.Material,
-
         value,
-
     ).Layout(
-
         gtx.Layout,
-
     )
-
 }
 ```
 
@@ -248,15 +239,11 @@ layout.Widget
 
 如果今天：
 
-改：
-
-Element。
+改：Element。
 
 我们几乎整个框架重写。
 
-我觉得：
-
-太早了。
+我觉得：太早了。
 
 ------
 
@@ -284,11 +271,8 @@ view.Text(
 
 ```go
 view.Text(
-
     th,
-
     "Hello",
-
 )
 ```
 
@@ -310,11 +294,8 @@ Button：
 
 ```go
 component.NewButton(
-
     th.Material,
-
     "OK",
-
 )
 ```
 
@@ -330,11 +311,8 @@ Text：
 
 ```go
 func Text(
-
     th *style.Theme,
-
     value string,
-
 ) element.Element
 ```
 
@@ -344,11 +322,8 @@ func Text(
 
 ```go
 material.Body1(
-
     th.Material,
-
     value,
-
 )
 ```
 
@@ -374,31 +349,18 @@ Go：
 
 ```go
 view.Text(
-
     theme,
-
     "Hello",
-
 )
 ```
 
 因为：
 
-Compose：
+Compose：有 CompositionLocal。
 
-有：
+Go：没有。
 
-CompositionLocal。
-
-Go：
-
-没有。
-
-那么：
-
-Go 有没有：
-
-更自然的方法？
+那么，Go 有没有更自然的方法？
 
 我觉得：
 
@@ -414,9 +376,7 @@ Go 有没有：
 
 ```go
 type HelloPage struct {
-
     Theme *style.Theme
-
 }
 ```
 
@@ -424,19 +384,13 @@ type HelloPage struct {
 
 ```go
 func (p *HelloPage) Text(
-
     value string,
-
 ) element.Element {
 
     return view.Text(
-
         p.Theme,
-
         value,
-
     )
-
 }
 ```
 
@@ -446,21 +400,12 @@ func (p *HelloPage) Text(
 
 ```go
 return container.Column(
-
     p.Text("Hello"),
-
     p.Text("World"),
-
 )
 ```
 
-业务：
-
-永远：
-
-不用：
-
-Theme。
+业务：永远不用 Theme。
 
 ------
 
@@ -472,9 +417,7 @@ Theme 本来就是：
 
 **Page Environment。**
 
-不是：
-
-全局 Environment。
+不是：全局 Environment。
 
 ------
 
@@ -516,11 +459,8 @@ Theme Injection。
 
 ```go
 view.Text(
-
     theme,
-
     "Hello",
-
 )
 ```
 
@@ -528,19 +468,14 @@ view.Text(
 
 第二步：
 
-Page：
-
-封装：
+Page 封装：
 
 ```go
 p.Text()
-
 p.Button()
 ```
 
-业务：
-
-再也看不到：
+业务再也看不到：
 
 Theme。
 
@@ -552,15 +487,9 @@ Theme。
 
 gorogio v0.5
 
-我们真的觉得：
+我们真的觉得：Theme 到处传太麻烦。
 
-Theme 到处传太麻烦。
-
-再考虑：
-
-是不是需要：
-
-UI Context。
+再考虑：是不是需要 UI Context。
 
 ------
 
@@ -641,23 +570,9 @@ Theme 从哪里来？
 
 一定能够顺着调用链找到。
 
-不能：
-
-```go
-CurrentTheme()
-```
-
-不能：
-
-```go
-GlobalTheme
-```
-
-不能：
-
-```go
-Singleton
-```
+1. 不能：`CurrentTheme()` 
+2. 不能：`GlobalTheme` 
+3. 不能：`Singleton` 
 
 这条原则，我希望十年都不要改。
 
@@ -741,11 +656,8 @@ UIContext
 
 ```go
 type UIContext struct {
-
     Layout layout.Context
-
     Theme *Theme
-
 }
 ```
 
@@ -761,9 +673,7 @@ Theme 放进 Context。
 
 **我们冻结的是原则。**
 
-不是：
-
-Theme Injection 这个具体实现。
+不是：Theme Injection 这个具体实现。
 
 ------
 
@@ -926,9 +836,7 @@ Extra Widget。
 
 为什么？
 
-因为：
-
-目标不同。
+因为：目标不同。
 
 ------
 

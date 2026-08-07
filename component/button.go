@@ -70,10 +70,10 @@ func (b *Button) Update(
 	}
 }
 
-// Build
+// Element
 //
 // 构建 UI Element。
-func (b *Button) Build(
+func (b *Button) Element(
 	th *style.Theme,
 ) element.Element {
 

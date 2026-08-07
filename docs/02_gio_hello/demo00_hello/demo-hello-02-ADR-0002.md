@@ -296,7 +296,6 @@ hello-gorogio-v2
 
 ```text
 examples/
-
 ├── gio
 │   └── hello
 │

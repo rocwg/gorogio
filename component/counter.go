@@ -75,8 +75,8 @@ func (c *Counter) Element(
 			container.Options{
 				Spacing: th.Spacing.Large,
 			},
-			c.increment.Build(th),
-			c.reset.Build(th),
+			c.increment.Element(th),
+			c.reset.Element(th),
 		),
 	)
 }
