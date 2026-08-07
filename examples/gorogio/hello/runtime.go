@@ -36,8 +36,7 @@ func Run() {
 func runWindow(
 	w *app.Window,
 ) error {
-	state := &CounterState{}
-	page := NewHelloPage(state)
+	page := NewHelloPage()
 	application := gorogioapp.New(page)
 
 	var ops op.Ops

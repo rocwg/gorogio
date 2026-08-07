@@ -1,8 +1,6 @@
 package main
 
 import (
-	"strconv"
-
 	"gioui.org/layout"
 
 	"github.com/rocwg/gorogio/component"
@@ -31,62 +29,28 @@ var _ page.Page = (*HelloPage)(nil)
 // 3. 页面 UI
 
 type HelloPage struct {
-	State *CounterState
-
-	Increment *component.Button
-	Reset     *component.Button
+	Counter *component.Counter
 }
 
 // NewHelloPage
 //
 // 创建页面。
-func NewHelloPage(
-	state *CounterState,
-) *HelloPage {
+func NewHelloPage() *HelloPage {
 
-	hello := &HelloPage{
-		State: state,
+	return &HelloPage{
+		Counter: component.NewCounter(),
 	}
-
-	hello.Increment =
-		component.NewButton("+").
-			OnClick(
-				func() {
-					hello.State.Increment()
-				},
-			)
-
-	hello.Reset =
-		component.NewButton("Reset").
-			OnClick(
-				func() {
-					hello.State.Reset()
-				},
-			)
-
-	return hello
 }
 
 // Update
 //
-// 生命周期:
-//
-// Application
-//
-//	|
-//	v
-//
-// Page.Update()
+// 生命周期: Application -> Page.Update()
 //
 // 处理输入事件。
 func (p *HelloPage) Update(
 	gtx layout.Context,
 ) {
-
-	p.Increment.Update(gtx)
-
-	p.Reset.Update(gtx)
-
+	p.Counter.Update(gtx)
 }
 
 // build
@@ -112,21 +76,7 @@ func (p *HelloPage) build(
 				"Hello Gio",
 			),
 
-			primitive.Body(
-				th,
-				"Count : "+strconv.Itoa(p.State.Count),
-			),
-
-			container.Row(
-
-				container.Options{
-					Spacing: th.Spacing.Large,
-				},
-
-				p.Increment.Build(th),
-
-				p.Reset.Build(th),
-			),
+			p.Counter.Element(th),
 		),
 	)
 }

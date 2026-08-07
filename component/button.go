@@ -9,8 +9,6 @@ import (
 	"github.com/rocwg/gorogio/style"
 )
 
-var _ Component = (*Button)(nil)
-
 // Button
 //
 // 一个有状态 UI Component。

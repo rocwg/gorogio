@@ -24,11 +24,8 @@
 
 ```text
 Element
-
 Container
-
 Modifier
-
 Theme
 ```
 
@@ -44,15 +41,10 @@ Theme
 
 ```text
 examples/
-
 gorogio/
-
 view/
-
 container/
-
 component/
-
 style/
 ```
 
