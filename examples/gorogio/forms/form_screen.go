@@ -96,9 +96,13 @@ func (f *FormScreen) Element(
 				"User Profile Form",
 			),
 
+			primitive.Divider(th),
+
 			f.UserName.Element(th),
 			f.Age.Element(th),
 			f.City.Element(th),
+
+			primitive.Divider(th),
 
 			container.Row(
 				container.Options{
