@@ -1,30 +1,147 @@
-**第8章：Text（文字）**
-
 **原文地址**：https://gioui.org/doc/architecture/text
 
 ---
 
-### 完整中文翻译
+在 GPU 硬件加速的 UI 框架中，文本处理本质上是将字符编码（Unicode）通过字体文件（TTF/OTF）进行 **塑形（Shaping）**，再转换为矢量 Path 或位图，最后由 GPU 渲染。Gio 提供了底层的 `text` 包和高层的 `material.Label` 来完成这一全流程。
 
-# Text
+章节：**Text（文本渲染与文本塑造）**。
 
-# Text 底层文字管理
 
-## Fonts（字体）
 
-Gio 的文字整形器使用类型 `[]text.FontFace` 来表示可用字体的集合。
+# 第8章：Text（文本）
 
-包 [gioui.org/font/gofont](https://gioui.org/font/gofont) 中捆绑了一个字体，你可以使用 [gofont.Collection()](https://gioui.org/font/gofont#Collection) 获取一个包含所有 Go 字体变体的 `[]text.FontFace`。
+#### Low-level text management (底层文本管理)
 
-要加载其他字体，可以使用 [gioui.org/font/opentype](https://gioui.org/font/opentype)。使用 [opentype.Parse](https://gioui.org/font/opentype#Parse) 解析字体后，可以把它们追加到 `[]text.FontFace` 中。
 
-## Shapes（形状）
 
-要把字符串转换成裁剪形状，可以使用 [gioui.org/text](https://gioui.org/text) 包。
+## Fonts（字体集合与加载）
 
-它包含 [text.Cache](https://gioui.org/text#Cache)，实现了带适当回退的缓存字符串到形状转换。只需把你的字体（`[]text.FontFace`）提供给 `text.NewCache` 即可。
+> **【英文原文】** 
+>
+> Gio’s text shaper uses the type `[]text.FontFace` to represent the collection of available fonts.
+>
+> There is one font bundled in package [`gioui.org/font/gofont`](https://gioui.org/font/gofont), you can use [`gofont.Collection()`](https://gioui.org/font/gofont#Collection) to get a `[]text.FontFace` containing all of the variants of the Go fonts.
+>
+> For loading other fonts there is [`gioui.org/font/opentype`](https://gioui.org/font/opentype). After parsing the font(s) using [`opentype.Parse`](https://gioui.org/font/opentype#Parse), you can append them to a `[]text.FontFace`.
 
-在大多数情况下，你可以使用 [widget.Label](https://gioui.org/widget#Label)，它会处理换行和布局约束。或者当你使用 Material Design 时，使用 [material.LabelStyle](https://gioui.org/widget/material#LabelStyle)。
+**【逐字精准翻译】** 
+
+Gio 的文本整形器（text shaper）使用 `[]text.FontFace` 类型来表示可用字体的集合。
+
+在包 `gioui.org/font/gofont` 中内置绑定了一种字体，你可以使用 `gofont.Collection()` 来获取包含 Go 字体所有变体（如 Bold, Italic, Regular 等）的 `[]text.FontFace` 集合。
+
+对于加载其他自定义字体，可以使用 `gioui.org/font/opentype`。在使用 `opentype.Parse` 解析字体后，你可以将它们追加（append）到 `[]text.FontFace` 中。
+
+- **代码落地范例（自定义 OpenType / TTF 字体加载）：** 
+
+  ```go
+  import (
+      "gioui.org/font/opentype"
+      "gioui.org/text"
+  )
+  
+  func loadCustomFont(fontBytes []byte) ([]text.FontFace, error) {
+      // 1. 解析字体字节数据
+      face, err := opentype.Parse(fontBytes)
+      if err != nil {
+          return nil, err
+      }
+      // 2. 将解析好的字体追加到 FontFace 集合中
+      var collection []text.FontFace
+      collection = append(collection, face)
+      return collection, nil
+  }
+  ```
+
+- **技术剖析：** 
+  - `text.FontFace`：封装了字体的底层二进制 Data 以及 Style（粗细、斜体等元数据）。
+  - `opentype.Parse`：能够解析 `.ttf` / `.otf` 标准字体文件，将其转换为 Gio 底层矢量引擎可绘制的 Face 对象。
+
+
+
+## Shapes（字形转化与缓存）
+
+> **【英文原文】** 
+>
+> For converting strings to clip shapes there is the [`gioui.org/text`](https://gioui.org/text) package.
+>
+> It contains [`text.Cache`](https://gioui.org/text#Cache) that implements cached string to shape conversion, with appropriate fallbacks. Simply provide your fonts (`[]text.FontFace`) to `text.NewCache`.
+
+**【逐字精准翻译】** 
+
+为了将字符串转换为裁切形状（Clip Shapes），Gio 提供了 `gioui.org/text` 包。
+
+它包含了 `text.Cache`（在最新版 Gio 中演进为由 `text.Shaper` 托管），实现了从字符串到图形形状的缓存转换，并附带恰当的后备字体（Fallback）机制。只需将你的字体集合（`[]text.FontFace`）传递给 `text.NewCache`（或 `text.NewShaper`）即可。
+
+- **底层机制说明：** 
+  Gio 是纯 GPU 矢量渲染框架。字符串并不能直接绘制，必须先经过 **Text Shaping（文本整形/排版）** 转换为字符轮廓路径（`clip.Path`）。为了避免每一帧重复计算矢量路径，`text.Cache` 会在内存中缓存计算好的字形路径，从而保持高性能。
+
+
+
+> **【英文原文】** 
+>
+> In most cases you can use [`widget.Label`](https://gioui.org/widget#Label) which handles wrapping and layout constraints. Or when you are using material design [`material.LabelStyle`](https://gioui.org/widget/material#LabelStyle).
+
+**【逐字精准翻译】** 
+
+在大多数情况下，你可以直接使用 `widget.Label`，它会自动处理换行（wrapping）和布局约束（layout constraints）。或者当你在使用 Material Design 时，直接使用 `material.LabelStyle`。
+
+- **应用层与底层对比：** 
+  - **高层（日常使用）：** 直接调用 `material.Body1(th, "Hello").Layout(gtx)`，框架会在内部自动调用 Shaper 与 Cache 完成测量和排版。
+  - **底层（自定义组件）：** 若要实现类似图文混排、富文本编辑器或特殊的弯曲文本，才需要直接操作 `text.Shaper` / `text.Cache`。
+
+
+
+### 4. 衍生实践代码：自定义加载 TTF 字体
+
+为了帮助你将这段文档转化为落地代码，以下展示如何在 Gio 中加载自定义的 `.ttf` 字体（如思源黑体或自定义英文字体）：
+
+```go
+import (
+	"gioui.org/font/opentype"
+	"gioui.org/text"
+	"gioui.org/widget/material"
+)
+
+func loadCustomFont(ttfData []byte) (*material.Theme, error) {
+	// 1. 解析 TTF/OTF 二进制数据
+	face, err := opentype.Parse(ttfData)
+	if err != nil {
+		return nil, err
+	}
+
+	// 2. 构建 FontFace 集合
+	fontFaces := []text.FontFace{face}
+
+	// 3. 创建 Shaper 并注入主题
+	th := material.NewTheme()
+	th.Shaper = text.NewShaper(text.WithCollection(fontFaces))
+
+	return th, nil
+}
+```
+
+
+
+### Gio 文本渲染架构剖析
+
+```powershell
+  [ String / UTF-8 ] 
+          │
+          ▼
+   [ text.Shaper ]  <───  ([]text.FontFace / GoFont / Custom TTF)
+          │
+  (Shaping & Metric Cache)
+          │
+          ▼
+ [ Vector Clip Path / GPU Draw Op ]  ───> [ Rendered Text on Screen ]
+```
+
+- **架构要点解析：**
+  - **Text Shaping（文本塑形）：** 文本并非简单的把字符贴在屏幕上。塑形引擎需要根据字体表计算字形（Glyph）索引、字距调整（Kerning）、基线（Baseline）以及从左到右/从右到左的排版。
+  - **高层与底层分工：**
+    - **底层（`text.Shaper`）：** 负责纯字形转换与测量，通常作为 `th.Shaper` 挂载在 `material.Theme` 上。
+    - **高层（`material.Label` / `widget.Label`）：** 自动响应 `gtx.Constraints` 约束进行断行（Line Wrapping）、省略号截断（Ellipsis），并将其转化为对应的 `PaintOp` 输出到画布中。
 
 ---
 

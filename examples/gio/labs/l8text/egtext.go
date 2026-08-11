@@ -1,4 +1,4 @@
-package l8text
+package main
 
 import (
 	"image/color"
@@ -20,7 +20,7 @@ import (
 */
 
 // EgLabelText widget 文本标签
-func EgLabelText(th *material.Theme, lText string) material.LabelStyle {
+func egLabelText(th *material.Theme, lText string) material.LabelStyle {
 	// 构造
 	lt := material.H1(th, lText)
 
@@ -31,6 +31,6 @@ func EgLabelText(th *material.Theme, lText string) material.LabelStyle {
 	return lt
 }
 
-func EgButtonText(th *material.Theme, btn *widget.Clickable) material.ButtonStyle {
+func egButtonText(th *material.Theme, btn *widget.Clickable) material.ButtonStyle {
 	return material.Button(th, btn, "Click me")
 }

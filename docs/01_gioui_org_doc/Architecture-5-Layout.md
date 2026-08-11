@@ -1,18 +1,30 @@
-**第5章：Layout（布局）**
-
 **原文地址**：https://gioui.org/doc/architecture/layout
 
 ---
 
-### 完整中文翻译
+采用 **【英文原文】 $\rightarrow$ 【精准逐字翻译】** $\rightarrow$ **【专业术语与 Gio 布局机制深度剖析】** 的方式，为你拆解 Gio 官方文档的第六章节：**Layout（布局系统）**。
 
-# Layout
+Gio 的 `layout` 包是声明式 UI 的精髓所在。它摒弃了传统坐标系绝对定位，全面转向基于约束传播（Constraint Propagation）**与**闭包组合（Closure Composition）的动态弹性布局系统。
 
-# Layout 把东西放在它们该在的地方
+
+
+# 第5章：Layout（布局）
+
+#### Putting things where they belong (把事物放在属于它们的位置)
+
+
+
+> **【英文原文】** 
+>
+> Package [`gioui.org/layout`](https://gioui.org/layout) provides support for common layout operations such as spacing, lists and stacks of overlapping widgets.
+>
+> In the layout examples we’ll use this `ColorBox` widget to visualize layouts:
+
+**【逐字精准翻译】** 
 
 包 [gioui.org/layout](https://gioui.org/layout) 为常见的布局操作提供支持，例如间距、列表和重叠控件的堆叠。
 
-在布局示例中，我们将使用这个 `ColorBox` 控件来可视化布局：
+在布局示例中，我们将使用这个 `ColorBox` 组件来可视化布局：
 
 ```go
 // 测试颜色。
@@ -32,9 +44,16 @@ func ColorBox(gtx layout.Context, size image.Point, color color.NRGBA) layout.Di
 }
 ```
 
+**概念剖析：**
+
+- `ColorBox` 是标准的无状态组件范例：裁切区域 $\rightarrow$ 填充颜色 $\rightarrow$ 绘制 $\rightarrow$ 返回 `layout.Dimensions`。
+
+
+
 ## Inset（内边距）
 
-[layout.Inset](https://gioui.org/layout#Inset) 在控件周围添加空间。
+[`layout.Inset`](https://gioui.org/layout#Inset) adds space around a widget.
+`layout.Inset` 在组件周围添加空间（外边距/内边距）。
 
 ```go
 func inset(gtx layout.Context) layout.Dimensions {
@@ -45,14 +64,29 @@ func inset(gtx layout.Context) layout.Dimensions {
 }
 ```
 
-## Stack（堆叠）
+- **核心原理：** `Inset.Layout` 会在调用闭包子组件前，先调整并**缩小** `gtx.Constraints`（减少 30dp），并在 `gtx.Ops` 中压入一个 `op.Offset` 平移坐标系，然后再把修改后的 `gtx` 传递给子组件。
 
-[layout.Stack](https://gioui.org/layout#Stack) 根据对齐方向布局重叠的子元素。堆叠布局的子元素可以是：
 
-* [Stacked](https://gioui.org/layout#Stacked) —— 没有最小约束，最大约束是传递给 Stack.Layout 的最大约束。
-* [Expanded](https://gioui.org/layout#Expanded) —— 使用最大的 Stacked 项作为最小约束，最大约束是传递给 Stack.Layout 的最大约束。
 
-例如，这会在红色背景上绘制绿色和蓝色矩形：
+## Stack（层叠布局）
+
+> **【英文原文】** 
+>
+> [`layout.Stack`](https://gioui.org/layout#Stack) lays out overlapping child elements according to the alignment direction. The child of a stack layout can be:
+>
+> - [`Stacked`](https://gioui.org/layout#Stacked) - which doesn’t have minimum constraints and the maximum constraints passed to Stack.Layout.
+> - [`Expanded`](https://gioui.org/layout#Expanded) - which uses the largest Stacked item as the minimum constraint and maximum is the maximum constraints passed to Stack.Layout.
+>
+> For example, this draws green and blue rectangles on top of a red background:
+
+**【逐字精准翻译】** 
+
+`layout.Stack` 根据对齐方向对重叠的子元素进行布局。层叠布局的子元素可以是：
+
+* **Stacked（自适应层）**：没有最小尺寸约束，其最大尺寸约束为传递给 `Stack.Layout` 的最大约束。(*==自然层叠/松散约束==*)
+* **Expanded（拉伸层）**：使用所有 `Stacked` 项中尺寸最大的那个作为其最小尺寸约束，其最大尺寸约束为传递给 `Stack.Layout` 的最大约束。(*==展开填充==*)
+
+例如，这段代码在红色背景上绘制了绿色和蓝色的矩形：
 
 ```go
 func stacked(gtx layout.Context) layout.Dimensions {
@@ -72,9 +106,21 @@ func stacked(gtx layout.Context) layout.Dimensions {
 }
 ```
 
+- **算法细节：** `Stack` 会先计算所有 `Stacked` 类型的子组件，得出一个最大包围盒（100x100）。然后将这个包围盒大小作为最小约束（`Constraints.Min`）强制传给 `Expanded` 子组件，从而实现“背景自动撑满前景”的层叠效果。
+- **计算顺序机制（Two-Pass Strategy）：** 
+  `Stack` 会**先评估所有 `Stacked` 子项**，测量出最大的宽高（例如上例中绿宽 100，蓝高 100 $\rightarrow$ 算出 $100 \times 100$）；然后将这个最大值作为 `Min` 约束传递给 **`Expanded` 子项**，实现背景自动铺满前景的效果。
+
+
+
 ### Background（背景）
 
-因为为控件布局背景非常频繁，所以有一个针对该场景的更高效实现，大致相当于：
+> **【英文原文】** 
+>
+> Because layouting a background for a widget is very frequent there is a more performant implementation for that scenario, which roughly corresponds to:
+
+**【逐字精准翻译】** 
+
+由于给组件布局背景非常频繁，Gio 为该场景提供了一种性能更高的实现，其逻辑大致等价于：
 
 ```go
 layout.Stack{Alignment: layout.C}.Layout(gtx,
@@ -96,14 +142,24 @@ func layoutBackground(gtx layout.Context) layout.Dimensions {
 }
 ```
 
+
+
 ## List（列表）
 
-[layout.List](https://gioui.org/layout#List) 可以显示一个可能很大的项目列表。由于 `List` 还处理滚动，它必须在布局之间持久化，否则滚动位置会丢失。List 通过只布局可见元素来处理大量项目。每一帧，提供的闭包只会对当前滚动位置可见的索引（以及可能在滚动位置上下的少量项目）被调用。
+> **【英文原文】** 
+>
+> [`layout.List`](https://gioui.org/layout#List) can display a potentially large list of items. Since `List` also handles scrolling it must be persisted across layouts, otherwise the scrolling position is lost. List handles large numbers of items by only laying out the visible elements. Each frame, the provided closure is invoked only for indicies visible at the current scroll position (and possibly a small number of items above and below the scroll position).
+
+**【逐字精准翻译】** 
+
+`layout.List` 可以高效显示海量数据列表。由于 `List` 同时也负责处理滚动，因此它的状态**必须在多次布局帧之间持久化保存**（声明为全局变量或 Struct 字段），否则滚动位置将会丢失。`List` 处理海量数据的方式是**仅对可见元素进行布局**。在每一帧中，传入的闭包仅针对当前滚动位置可见的索引（以及滚动位置上下相邻的极少数元素）被调用。
 
 ```go
+// 必须在函数体外定义，保持滚动状态持久
 var list = layout.List{}
 
 func listing(gtx layout.Context) layout.Dimensions {
+    // 参数分别表示：gtx，元素总数，子项生成闭包
 	return list.Layout(gtx, 100, func(gtx layout.Context, i int) layout.Dimensions {
 		col := color.NRGBA{R: byte(i * 20), G: 0x20, B: 0x20, A: 0xFF}
 		return ColorBox(gtx, image.Pt(20, 100), col)
@@ -111,14 +167,31 @@ func listing(gtx layout.Context) layout.Dimensions {
 }
 ```
 
+- **性能关键机制（Virtualization）：** 
+  类似于 Flutter 的 `ListView.builder` 或 Web 的 Virtual List。就算元素总数传 `1_000_000`，Gio 也只会在渲染帧时调用当前视口能容纳的 10~20 次闭包，内存与 GPU 开销为 $O(\text{visible})$。
+- **核心算法（虚拟化渲染 / Virtual Windowing）**：Gio 的 `List` 是内置懒加载/虚拟列表的。即便列表有 1,000,000 个元素，闭包也只会触发渲染当前屏幕可视区域内的那 10~20 个，因此性能极高且内存零占用。
+
+
+
 ## Flex（弹性布局）
 
-[layout.Flex](https://gioui.org/layout#Flex) 根据子元素的权重或刚性约束来布局它们。首先使用刚性元素来确定剩余空间，然后根据权重在弹性子元素之间分配剩余空间。
+> **【英文原文】** 
+>
+> [`layout.Flex`](https://gioui.org/layout#List) lays out children according to their weights or rigid constraints. First the rigid elements are used to determine the remaining space and then the remaining space is divided among flexed children according to weights.
+>
+> The children can be:
+>
+> - [`Rigid`](https://gioui.org/layout#Rigid) - are laid out with as much space left over from other rigid children.
+> - [`Flexed`](https://gioui.org/layout#Flexed) - children are sized according to their weights and the space left over from rigid children.
+
+**【逐字精准翻译】** 
+
+`layout.Flex` 根据权重（Weights）或固定/刚性约束（Rigid constraints）来排列子元素。它首先测量所有刚性（Rigid）元素以确定剩余可用空间，然后根据权重将剩余空间分配给弹性（Flexed）子元素。
 
 子元素可以是：
 
-* [Rigid](https://gioui.org/layout#Rigid) —— 用从其他刚性子元素留下的尽可能多的空间进行布局。
-* [Flexed](https://gioui.org/layout#Flexed) —— 子元素根据它们的权重和从刚性子元素留下的空间来调整大小。
+* **Rigid（刚性/固定）：** 根据其他刚性元素剩余的空间来进行布局（尺寸由自身决定，不受比例分配影响）。
+* **Flexed（弹性/按比例）：** 尺寸根据其权重以及从刚性元素中剩下的空间进行计算分摊。
 
 ```go
 func flexed(gtx layout.Context) layout.Dimensions {
@@ -139,9 +212,23 @@ func flexed(gtx layout.Context) layout.Dimensions {
 }
 ```
 
+- **算法逻辑（类似 CSS Flexbox）：**
+  1. 计算所有 `Rigid` 子项的总宽度（如 $100 + 100 = 200\text{px}$）。
+  2. 计算剩余可用空间 $S_{\text{remain}} = \text{Max.X} - 200$。
+  3. 分别将 $0.5 \times S_{\text{remain}}$ 作为精确约束传给两个 `Flexed` 子项。
+- **对照概念：** 类似于 CSS 的 Flexbox（`Axis: layout.Horizontal/Vertical`），`Rigid` 相当于 `flex: 0 0 auto`，`Flexed` 相当于 `flex: weight`。
+
+
+
 ## Spacer（间隔）
 
-[layout.Spacer](https://gioui.org/layout#Spacer) 可以与 `layout.List` 或 `layout.Flex` 一起使用，在项目之间添加空白空间。
+> **【英文原文】** 
+>
+> [`layout.Spacer`](https://gioui.org/layout#Spacer) can be used together with `layout.List` or `layout.Flex` to add empty space between items.
+
+**【逐字精准翻译】** 
+
+`layout.Spacer` 可以与 `layout.List` 或 `layout.Flex` 配合使用，在子项之间添加空白间距。
 
 ```go
 func spacer(gtx layout.Context) layout.Dimensions {
@@ -149,7 +236,7 @@ func spacer(gtx layout.Context) layout.Dimensions {
 		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 			return ColorBox(gtx, image.Pt(100, 100), red)
 		}),
-		layout.Rigid(layout.Spacer{Width: 20}.Layout),
+		layout.Rigid(layout.Spacer{Width: 20}.Layout), // 插入 20px 间距
 		layout.Flexed(0.5, func(gtx layout.Context) layout.Dimensions {
 			return ColorBox(gtx, gtx.Constraints.Min, blue)
 		}),
@@ -165,22 +252,40 @@ func spacer(gtx layout.Context) layout.Dimensions {
 }
 ```
 
+
+
 ## Custom（自定义）
 
-有时内置布局不够用。要为控件创建自定义布局，有特殊的函数和结构来操作 layout.Context。一般来说，布局代码对每个子控件执行以下步骤：
+> **【英文原文】** 
+>
+> Sometimes the builtin layouts are not sufficient. To create a custom layout for widgets there are special functions and structures to manipulate layout.Context. In general, layout code performs the following steps for each sub-widget:
+>
+> - Use `op.Save`.
+> - Set `layout.Context.Constraints`.
+> - Set `op.TransformOp`.
+> - Call `widget.Layout(gtx, ...)`.
+> - Use dimensions returned by widget.
+> - Use `StateOp.Load`.
 
-* 使用 op.Save。
-* 设置 layout.Context.Constraints。
-* 设置 op.TransformOp。
-* 调用 widget.Layout(gtx, ...)。
-* 使用控件返回的尺寸。
-* 使用 StateOp.Load。
+**【逐字精准翻译】** 
 
-对于复杂的布局，你还需要使用宏。作为一个例子，请看 [layout.Flex](https://gioui.org/layout#Flex)。它大致实现了：
+有时内置的布局组件并不够用。为了给组件创建自定义布局，存在专门用于操作 `layout.Context` 的函数和结构体。通常，布局代码对每个子组件执行以下步骤：
 
-1. 把控件录制进宏。
-2. 为非刚性控件计算尺寸。
-3. 通过回放它们的宏，根据计算出的尺寸绘制控件。
+* 使用 `op.Save`（保存当前状态）。
+* 设置 `layout.Context.Constraints`（约束条件）。
+* 设置 `op.TransformOp`（平移/转换坐标系）。
+* 调用 `widget.Layout(gtx, ...)` 进行子控件布局。
+* 使用组件返回的 `Dimensions`（尺寸）。
+* 使用 `StateOp.Load`（恢复之前的状态）。
+
+对于复杂的布局，你还需要使用**宏（Macros）**。以 `layout.Flex` 为例，它的内部逻辑大致实现为：
+
+1. 在宏（macros）中录制组件（不立刻绘制）。
+2. 计算非刚性（Flexed）组件的尺寸。
+3. 通过回放（Replay）录制的 Macro，根据计算好的尺寸将组件绘制出来。
+
+**宏（Macro）的必要性：** 
+在 Go 即时模式 UI 中，如果不使用 Macro，调用 `widget.Layout()` 会**直接将画笔指令追加到全局 Ops 中**。而 Flex 布局在不知道 Rigid 元素尺寸前，无法确定 Flexed 元素的坐标偏移。因此通过 `op.Record()` 先“录屏”但不输出，等坐标算清后再 `replay()`，这就是 Gio 高效自定义布局的底层秘诀！
 
 ---
 
