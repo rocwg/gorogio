@@ -16,7 +16,8 @@ func main() {
 	//创建窗口
 	go func() {
 		window := new(app.Window)
-		err := run(window)
+		//err := run(window)
+		err := run1(window)
 		if err != nil {
 			log.Fatal(err)
 		}
